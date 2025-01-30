@@ -1,8 +1,54 @@
 <!DOCTYPE html>
-
-<html>
-	<body>
-		<h1>Test</h1>
-		<p>BACS Weather App</p>
-	</body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        .content-box {
+            background: rgba(0, 0, 0, 0.6);
+            width: 300px;
+            margin: 100px auto;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        p {
+            margin: 0 0 20px 0;
+            font-size: 14px;
+        }
+        a {
+            display: block;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        a:hover {
+            color: #00ff99;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-box">
+        <h1>WEATHER APP</h1>
+        <p>Your Gateway to Reliable Weather Information.</p>
+        <a href="#radar">Radar</a>
+        <a href="#forecast">Weather Forecast</a>
+        <a href="#air-quality">Air Quality</a>
+        <a href="#uv-index">UV Index</a>
+        <a href="#sunrise-sunset">Sunrise and Sunset Time</a>
+    </div>
+</body>
 </html>
