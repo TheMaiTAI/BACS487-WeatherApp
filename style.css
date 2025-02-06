@@ -12,11 +12,15 @@
 
 .content-box {
     background: rgba(0, 0, 0, 0.6);
-    width: 300px;
+    width: 75%;
     margin: 100px auto;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
+}
+
+.main {
+    width: 300px;
 }
 
 h1 {
