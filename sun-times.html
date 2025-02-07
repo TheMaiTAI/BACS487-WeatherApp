@@ -14,16 +14,10 @@
 
     <div class="container mt-4">
         <div class="card p-4 shadow-sm">
-            <h2 class="text-center">Get Sunrise & Sunset Times</h2>
-            <form id="sunTimeForm" class="text-center">
+            <h2 class="text-center">Enter Your ZIP Code</h2>
+            <form id="zipForm" class="text-center">
                 <div class="mb-3">
-                    <input type="text" id="latitude" class="form-control" placeholder="Enter Latitude (e.g., 40.7128)" required>
-                </div>
-                <div class="mb-3">
-                    <input type="text" id="longitude" class="form-control" placeholder="Enter Longitude (e.g., -74.0060)" required>
-                </div>
-                <div class="mb-3">
-                    <input type="text" id="timezone" class="form-control" placeholder="Enter Timezone (e.g., America/New_York)" required>
+                    <input type="text" id="zipCode" class="form-control" placeholder="Enter ZIP Code (e.g., 10001)" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Get Times</button>
             </form>
@@ -37,22 +31,33 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById("sunTimeForm").addEventListener("submit", function(event) {
+        document.getElementById("zipForm").addEventListener("submit", function(event) {
             event.preventDefault();
             
-            let lat = document.getElementById("latitude").value;
-            let lng = document.getElementById("longitude").value;
-            let timezone = document.getElementById("timezone").value;
+            let zip = document.getElementById("zipCode").value;
+            let apiKey = "YOUR_OPENWEATHERMAP_API_KEY";  // Replace with your OpenWeatherMap API Key
             
-            fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`)
+            // Step 1: Get Latitude & Longitude from ZIP code
+            fetch(`https://api.openweathermap.org/data/2.5/weather?zip=${zip},US&appid=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    let lat = data.coord.lat;
+                    let lon = data.coord.lon;
+                    let timezone = data.timezone;  // OpenWeatherMap provides timezone offset
+
+                    // Step 2: Get Sunrise & Sunset from Sunrise-Sunset API
+                    return fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}&formatted=0`);
+                })
                 .then(response => response.json())
                 .then(data => {
                     let sunriseUTC = new Date(data.results.sunrise);
                     let sunsetUTC = new Date(data.results.sunset);
                     
-                    let sunriseLocal = sunriseUTC.toLocaleTimeString("en-US", { timeZone: timezone });
-                    let sunsetLocal = sunsetUTC.toLocaleTimeString("en-US", { timeZone: timezone });
+                    // Convert times to local timezone
+                    let sunriseLocal = sunriseUTC.toLocaleTimeString("en-US", { timeZone: "America/New_York" }); 
+                    let sunsetLocal = sunsetUTC.toLocaleTimeString("en-US", { timeZone: "America/New_York" });
 
+                    // Display the results
                     document.getElementById("sunrise").innerText = sunriseLocal;
                     document.getElementById("sunset").innerText = sunsetLocal;
                 })
@@ -61,3 +66,4 @@
     </script>
 </body>
 </html>
+
