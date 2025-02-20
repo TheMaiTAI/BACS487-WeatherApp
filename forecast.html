@@ -1,67 +1,290 @@
-﻿<!DOCTYPE html>
-
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en-US">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Forecast</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+        .weather-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        h3 {
+            color: #2c3e50;
+        }
+        .weather-icon {
+            width: 100px;
+            height: 100px;
+        }
+        .weather-icon-small {
+            width: 50px;
+            height: 50px;
+        }
+        .conditions p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+        .hourly-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 0;
+        }
+        .hour-forecast {
+            text-align: center;
+            min-width: 100px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .daily-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .day-forecast {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .day {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Weather Forecast</h1>
-        <a href="https://themaitai.github.io/BACS487-WeatherApp/" class="button">Home</a>
-    </div>
+    <div id="navigationContainer"></div>
+    <div class="container">
+        <div class="content-box">
+            <div id="location-info" class="mb-4"></div>
+            
+            <!-- Current Weather -->
+            <div id="current-weather" class="weather-section mb-4">
+                <h3>Current Conditions</h3>
+                <div class="btn-group btn-group-sm float-end" role="group" aria-label="Temperature unit toggle">
+                    <button type="button" class="btn btn-outline-secondary" onclick="setTemperatureUnit('celsius')">°C</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="setTemperatureUnit('fahrenheit')">°F</button>
+                </div>
+                <div class="current-details">
+                    <div class="temp-container">
+                        <span id="current-temp" class="temperature"></span>
+                        <img id="current-icon" class="weather-icon" src="https://example.com/new-icon.png" alt="Weather Icon">
+                    </div>
+                    <div class="conditions">
+                        <p id="current-conditions"></p>
+                        <p id="feels-like"></p>
+                        <p id="humidity"></p>
+                        <p id="wind"></p>
+                    </div>
+                </div>
+            </div>
 
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">7-Day Forecast</h2>
-        <div class="row text-center">
-            <!-- Placeholder for 7-day forecast -->
-            <div class="col-md-1 col-12 day-box bg-info text-white p-3 m-1">
-                <h4>Today</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>75°F</p>
-                <p>Sunny</p>
+            <!-- Hourly Forecast -->
+            <div id="hourly-forecast" class="weather-section mb-4">
+                <h3>Hourly Forecast</h3>
+                <div class="hourly-container"></div>
             </div>
-            <div class="col-md-1 col-12 day-box bg-secondary text-white p-3 m-1">
-                <h4>Day 2</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>72°F</p>
-                <p>Cloudy</p>
-            </div>
-            <div class="col-md-1 col-12 day-box bg-info text-white p-3 m-1">
-                <h4>Day 3</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>70°F</p>
-                <p>Rain</p>
-            </div>
-            <div class="col-md-1 col-12 day-box bg-secondary text-white p-3 m-1">
-                <h4>Day 4</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>68°F</p>
-                <p>Partly Cloudy</p>
-            </div>
-            <div class="col-md-1 col-12 day-box bg-info text-white p-3 m-1">
-                <h4>Day 5</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>74°F</p>
-                <p>Sunny</p>
-            </div>
-            <div class="col-md-1 col-12 day-box bg-secondary text-white p-3 m-1">
-                <h4>Day 6</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>77°F</p>
-                <p>Cloudy</p>
-            </div>
-            <div class="col-md-1 col-12 day-box bg-info text-white p-3 m-1">
-                <h4>Day 7</h4>
-                <img src="https://via.placeholder.com/50" alt="Weather Icon">
-                <p>79°F</p>
-                <p>Sunny</p>
+
+            <!-- Daily Forecast -->
+            <div id="daily-forecast" class="weather-section">
+                <h3>5-Day Forecast</h3>
+                <div class="daily-container"></div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="js/navigation.js"></script>
+    <script type="module">
+        // Initialize navigation
+        Navigation.createNavigation('navigationContainer');
+    
+        let currentUnit = localStorage.getItem('temperatureUnit') || 'fahrenheit';
+        
+        // Make setTemperatureUnit globally accessible
+        window.setTemperatureUnit = function(unit) {
+            currentUnit = unit;
+            localStorage.setItem('temperatureUnit', unit);
+            
+            // Update UI to show active unit button
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active', 'btn-primary');
+                btn.classList.add('btn-outline-secondary');
+                if ((unit === 'celsius' && btn.textContent === '°C') ||
+                    (unit === 'fahrenheit' && btn.textContent === '°F')) {
+                    btn.classList.remove('btn-outline-secondary');
+                    btn.classList.add('active', 'btn-primary');
+                }
+            });
+            
+            // Refresh the weather display
+            const storedLocation = JSON.parse(localStorage.getItem('weatherLocation'));
+            if (storedLocation) {
+                loadWeatherData(storedLocation.lat, storedLocation.lon);
+            }
+        };
+        
+        // Initialize temperature unit buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            setTemperatureUnit(currentUnit);
+        });
+        
+        function setTemperatureUnit(unit) {
+            currentUnit = unit;
+            localStorage.setItem('temperatureUnit', unit);
+            
+            // Update UI to show active unit button
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active', 'btn-primary');
+                btn.classList.add('btn-outline-secondary');
+                if ((unit === 'celsius' && btn.textContent === '°C') ||
+                    (unit === 'fahrenheit' && btn.textContent === '°F')) {
+                    btn.classList.remove('btn-outline-secondary');
+                    btn.classList.add('active', 'btn-primary');
+                }
+            });
+            
+            // Refresh the weather display
+            const storedLocation = JSON.parse(localStorage.getItem('weatherLocation'));
+            if (storedLocation) {
+                loadWeatherData(storedLocation.lat, storedLocation.lon);
+            }
+        }
+        
+        function convertTemperature(fahrenheit) {
+            return currentUnit === 'celsius' ? Math.round((fahrenheit - 32) * 5/9) : Math.round(fahrenheit);
+        }
+        
+        // Load weather data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const storedLocation = JSON.parse(localStorage.getItem('weatherLocation'));
+                if (!storedLocation) {
+                    document.getElementById('location-info').innerHTML = 
+                        '<p class="text-danger">No location selected. Please return to the home page to select a location.</p>';
+                    return;
+                }
+
+                document.getElementById('location-info').textContent = `Weather for ${storedLocation.name}`;
+                await loadWeatherData(storedLocation.lat, storedLocation.lon);
+            } catch (error) {
+                console.error('Error loading weather data:', error);
+                document.getElementById('location-info').innerHTML = 
+                    '<p class="text-danger">Error loading weather data. Please try again later.</p>';
+            }
+        });
+
+        async function loadWeatherData(lat, lon) {
+            try {
+                // Fetch current weather
+                const currentResponse = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=c1ebc435fc4c558d9501e772be6e7a35`
+                );
+                if (!currentResponse.ok) {
+                    throw new Error(`Current weather request failed: ${currentResponse.status}`);
+                }
+                const currentData = await currentResponse.json();
+
+                // Fetch forecast
+                const forecastResponse = await fetch(
+                    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=c1ebc435fc4c558d9501e772be6e7a35`
+                );
+                if (!forecastResponse.ok) {
+                    throw new Error(`Forecast request failed: ${forecastResponse.status}`);
+                }
+                const forecastData = await forecastResponse.json();
+
+                displayCurrentWeather(currentData);
+                displayHourlyForecast(forecastData.list.slice(0, 8)); // Next 24 hours (3-hour intervals)
+                displayDailyForecast(forecastData.list);
+            } catch (error) {
+                console.error('Error loading weather data:', error);
+                throw error;
+            }
+        }
+
+        function displayCurrentWeather(data) {
+            document.getElementById('current-temp').textContent = `${convertTemperature(data.main.temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
+            document.getElementById('current-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+            document.getElementById('current-conditions').textContent = data.weather[0].description;
+            document.getElementById('feels-like').textContent = `Feels like: ${convertTemperature(data.main.feels_like)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
+            document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
+            document.getElementById('wind').textContent = `Wind: ${Math.round(data.wind.speed)} mph`;
+        }
+
+        function displayHourlyForecast(hourlyData) {
+            const container = document.querySelector('.hourly-container');
+            container.innerHTML = '';
+
+            hourlyData.forEach(hour => {
+                const time = new Date(hour.dt * 1000);
+                const temp = Math.round(hour.main.temp);
+                const icon = hour.weather[0].icon;
+                const description = hour.weather[0].description;
+
+                const hourDiv = document.createElement('div');
+                hourDiv.className = 'hour-forecast';
+                hourDiv.innerHTML = `
+                    <div class="time">${time.getHours()}:00</div>
+                    <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${description}" class="weather-icon-small">
+                    <div class="temp">${convertTemperature(temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
+                `;
+                container.appendChild(hourDiv);
+            });
+        }
+
+        function displayDailyForecast(forecastList) {
+            const container = document.querySelector('.daily-container');
+            container.innerHTML = '';
+
+            // Group forecast data by day
+            const dailyData = {};
+            forecastList.forEach(item => {
+                const date = new Date(item.dt * 1000).toLocaleDateString();
+                if (!dailyData[date]) {
+                    dailyData[date] = {
+                        temps: [],
+                        icons: [],
+                        descriptions: [],
+                        date: new Date(item.dt * 1000)
+                    };
+                }
+                dailyData[date].temps.push(item.main.temp);
+                dailyData[date].icons.push(item.weather[0].icon);
+                dailyData[date].descriptions.push(item.weather[0].description);
+            });
+
+            // Create daily forecast elements
+            Object.values(dailyData).slice(0, 5).forEach(day => {
+                const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
+                const avgTemp = Math.round(day.temps.reduce((a, b) => a + b, 0) / day.temps.length);
+                // Get the most common icon for the day
+                const mostFrequentIcon = day.icons.sort((a,b) =>
+                    day.icons.filter(v => v === a).length - day.icons.filter(v => v === b).length
+                ).pop();
+                const mostFrequentDescription = day.descriptions.sort((a,b) =>
+                    day.descriptions.filter(v => v === a).length - day.descriptions.filter(v => v === b).length
+                ).pop();
+
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day-forecast';
+                dayDiv.innerHTML = `
+                    <div class="day">${dayName}</div>
+                    <img src="https://openweathermap.org/img/wn/${mostFrequentIcon}@2x.png" alt="${mostFrequentDescription}" class="weather-icon-small">
+                    <div class="temp">${convertTemperature(avgTemp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
+                `;
+                container.appendChild(dayDiv);
+            });
+        }
+    </script>
 </body>
 </html>
