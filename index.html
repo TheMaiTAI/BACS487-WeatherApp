@@ -81,7 +81,14 @@
             </a>
         </div>
 
-
+        <!-- Current Weather Display -->
+        <div id="currentWeather" class="weather-section mb-4 d-none">
+            <div class="current-weather-container">
+                <div class="temperature-section">
+                    <span id="temperature" data-celsius=""></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -180,8 +187,7 @@
                                         name: data[0]?.name || 'Unknown Location',
                                         country: data[0]?.country || ''
                                     };
-                                    await saveLocationAndRedirect(coordinates);
-                                    loadingSpinner.classList.add('d-none');
+                                    saveLocationAndRedirect(coordinates);
                                 } catch (error) {
                                     console.error('Error getting location name:', error);
                                     document.querySelector('.invalid-feedback').textContent = 'Error getting location details. Please try again.';
@@ -208,35 +214,17 @@
 
         async function getCoordinates(location) {
             try {
-                let geocodingUrl;
-                // Check if input is a US zip code (5 digits)
-                if (/^\d{5}$/.test(location)) {
-                    geocodingUrl = `https://api.openweathermap.org/geo/1.0/zip?zip=${location},US&appid=${OPENWEATHER_API_KEY}`;
-                } else {
-                    geocodingUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
-                }
-
+                const geocodingUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${OPENWEATHER_API_KEY}`;
                 const response = await fetch(geocodingUrl);
                 const data = await response.json();
                 
-                if (response.ok) {
-                    if (/^\d{5}$/.test(location)) {
-                        // Zip code response format
-                        return {
-                            lat: data.lat,
-                            lon: data.lon,
-                            name: data.name,
-                            country: data.country
-                        };
-                    } else if (data.length > 0) {
-                        // City name response format
-                        return {
-                            lat: data[0].lat,
-                            lon: data[0].lon,
-                            name: data[0].name,
-                            country: data[0].country
-                        };
-                    }
+                if (data.length > 0) {
+                    return {
+                        lat: data[0].lat,
+                        lon: data[0].lon,
+                        name: data[0].name,
+                        country: data[0].country
+                    };
                 }
                 return null;
             } catch (error) {
@@ -245,14 +233,10 @@
             }
         }
 
-        async function saveLocationAndRedirect(coordinates) {
+        function saveLocationAndRedirect(coordinates) {
             localStorage.setItem('weatherLocation', JSON.stringify(coordinates));
-            document.getElementById('locationText').textContent = `${coordinates.name}, ${coordinates.country}`;
-            document.querySelector('#currentLocationDisplay .alert').classList.remove('d-none');
-
+            window.location.href = 'forecast.html';
         }
-
-
     </script>
 </body>
 </html>

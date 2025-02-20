@@ -1,4 +1,4 @@
-/* Base Styles */
+﻿/* Base Styles */
 body {
     margin: 0;
     min-height: 100vh;
@@ -587,5 +587,114 @@ p {
         background-color: #0d6efd;
         border-color: #0d6efd;
         color: white;
+    }
+}
+
+/* Weather Forecast Styles */
+.weather-section {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.current-details {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.temp-container {
+    display: flex;
+    align-items: center;
+    margin-right: 30px;
+}
+
+.temperature {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.weather-icon {
+    width: 80px;
+    height: 80px;
+}
+
+.weather-icon-small {
+    width: 50px;
+    height: 50px;
+}
+
+.conditions p {
+    margin: 5px 0;
+    font-size: 1.1rem;
+}
+
+.hourly-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 15px 0;
+    gap: 20px;
+}
+
+.hour-forecast {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+}
+
+.hour-forecast .time {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.daily-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.day-forecast {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+}
+
+.day-forecast .day {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.btn-group {
+    margin-top: -30px;
+}
+
+@media (max-width: 768px) {
+    .current-details {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .temp-container {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .daily-container {
+        justify-content: center;
+    }
+
+    .day-forecast {
+        min-width: 140px;
     }
 }

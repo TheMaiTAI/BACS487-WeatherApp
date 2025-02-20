@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -25,9 +25,7 @@
         const AIRNOW_API_KEY = '9C257C20-E02E-43E8-A6B7-909DF4E964AC';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize navigation
             Navigation.createNavigation('navigationContainer');
-
             const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
             const locationDisplay = document.getElementById('locationDisplay');
             const aqiData = document.getElementById('aqiData');
@@ -46,7 +44,7 @@
 
         async function getAirQualityData(lat, lon) {
             try {
-                const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${lat}&longitude=${lon}&distance=50&API_KEY=9C257C20-E02E-43E8-A6B7-909DF4E964AC`;
+                const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${lat}&longitude=${lon}&distance=50&API_KEY=${AIRNOW_API_KEY}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 displayAirQuality(data);
