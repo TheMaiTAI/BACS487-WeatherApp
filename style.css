@@ -5,7 +5,10 @@ body {
     padding: 25px;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     color: #2d3436;
-    background: linear-gradient(135deg, #6ab7ff 0%, #005bea 100%);
+    background: url('assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
     box-sizing: border-box;
     position: relative;
