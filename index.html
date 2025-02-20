@@ -257,7 +257,11 @@
 
         function saveLocationAndRedirect(coordinates) {
             localStorage.setItem('weatherLocation', JSON.stringify(coordinates));
-            window.location.href = 'forecast.html';
+            // Update location display
+            const locationDisplay = document.getElementById('currentLocationDisplay');
+            const locationText = document.getElementById('locationText');
+            locationText.textContent = `${coordinates.name}, ${coordinates.country}`;
+            locationDisplay.querySelector('.alert').classList.remove('d-none');
         }
     </script>
 </body>
