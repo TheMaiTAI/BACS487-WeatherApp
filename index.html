@@ -139,39 +139,39 @@
                     const query = locationInput.value.trim();
                     const autocompleteResults = document.getElementById('autocompleteResults');
                     
+                    // Check if input is a zip code (5 digits)
+                    const isZipCode = /^\d{5}$/.test(query);
+                    
+                    if (isZipCode) {
+                        // For zip codes, directly fetch the location data
+                        fetch(`https://api.openweathermap.org/geo/1.0/zip?zip=${query},US&appid=${OPENWEATHER_API_KEY}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.name) {
+                                    // Automatically set the location data
+                                    locationInput.value = `${data.name}, US`;
+                                    document.getElementById('latInput').value = data.lat;
+                                    document.getElementById('lonInput').value = data.lon;
+                                    autocompleteResults.innerHTML = '';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching zip code data:', error);
+                            });
+                        return;
+                    }
+                    
                     if (query.length < 3) {
                         autocompleteResults.innerHTML = '';
                         return;
                     }
 
-                    // Check if input is a zip code (5 digits)
-                    const isZipCode = /^\d{5}$/.test(query);
-                    
-                    // Use zip code specific endpoint if it's a zip code
-                    const geocodingUrl = isZipCode
-                        ? `https://api.openweathermap.org/geo/1.0/zip?zip=${query},US&appid=${OPENWEATHER_API_KEY}`
-                        : `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${OPENWEATHER_API_KEY}`;
-
-                    fetch(geocodingUrl)
+                    // City search with autocomplete
+                    fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${OPENWEATHER_API_KEY}`)
                         .then(response => response.json())
                         .then(data => {
                             autocompleteResults.innerHTML = '';
-                            if (isZipCode) {
-                                // Handle zip code response
-                                if (data.name) {
-                                    const div = document.createElement('div');
-                                    div.className = 'autocomplete-item';
-                                    div.textContent = `${data.name}, US`;
-                                    div.addEventListener('click', () => {
-                                        locationInput.value = div.textContent;
-                                        autocompleteResults.innerHTML = '';
-                                        document.getElementById('latInput').value = data.lat;
-                                        document.getElementById('lonInput').value = data.lon;
-                                    });
-                                    autocompleteResults.appendChild(div);
-                                }
-                            } else if (Array.isArray(data) && data.length > 0) {
-                                // Handle city search response
+                            if (Array.isArray(data) && data.length > 0) {
                                 data.forEach(location => {
                                     const div = document.createElement('div');
                                     div.className = 'autocomplete-item';
