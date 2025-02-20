@@ -262,6 +262,8 @@
             const locationText = document.getElementById('locationText');
             locationText.textContent = `${coordinates.name}, ${coordinates.country}`;
             locationDisplay.querySelector('.alert').classList.remove('d-none');
+            // Hide loading spinner
+            document.getElementById('loadingSpinner').classList.add('d-none');
         }
     </script>
 </body>
