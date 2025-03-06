@@ -16,11 +16,17 @@
         <p>View live weather radar updates.</p>
         
         <div class="radar-container">
-            <iframe 
-                id="radarIframe"
-                frameborder="0" 
-                allowfullscreen
-            ></iframe>
+            <div style="display:block!important;position:relative!important;max-width:177.612vh!important;margin:auto!important;padding:0!important;border:0!important">
+                <div style="display:block!important;position:relative!important;width:100%!important;height:0!important;box-sizing:content-box!important;margin:0!important;border:0!important;padding:0 0 56.303%!important;left:0!important;top:0!important;right:0!important;bottom:0!important">
+                    <iframe 
+                        id="radarIframe"
+                        frameborder="0" 
+                        allowfullscreen
+                        style="display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;right:auto!important;bottom:auto!important"
+                        loading="lazy"
+                    ></iframe>
+                </div>
+            </div>
             <div id="mapLoading">
                 <div class="spinner-border text-light" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -34,7 +40,7 @@
         const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
         const locationDisplay = document.getElementById('locationDisplay');
         const mapLoading = document.getElementById('mapLoading');
-        const iframeSrc = `https://www.rainviewer.com/map.html?loc=${locationData.lat},${locationData.lon},5.516589951207117&oCS=1&c=3&o=83&lm=1&layer=sat-rad&sm=1&sn=1&ts=2`;
+        const iframeSrc = `https://embed.ventusky.com/?p=${locationData.lat};${locationData.lon};11&l=radar&pin=${locationData.lat};${locationData.lon};dot;${encodeURIComponent(locationData.name)}`;
         document.getElementById('radarIframe').src = iframeSrc;
 
         if (locationData) {
