@@ -3,48 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Forecast</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <title>Air Quality</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <body>
     <div id="navigationContainer"></div>
-    <div class="container">
-        <div class="content-box">
-            <div id="location-info" class="mb-4"></div>
-            
-            <!-- Current Weather -->
-            <div id="current-weather" class="weather-section mb-4">
-                <h3>Current Conditions</h3>
-                <div class="btn-group btn-group-sm float-end" role="group" aria-label="Temperature unit toggle">
-                    <button type="button" class="btn btn-outline-secondary" onclick="setTemperatureUnit('celsius')">°C</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="setTemperatureUnit('fahrenheit')">°F</button>
-                </div>
-                <div class="current-details">
-                    <div class="temp-container">
-                        <span id="current-temp" class="temperature"></span>
-                        <img id="current-icon" class="weather-icon" src="https://openweathermap.org/img/wn/10d@2x.png" alt="Weather Icon">
-                    </div>
-                    <div class="conditions">
-                        <p id="current-conditions"></p>
-                        <p id="feels-like"></p>
-                        <p id="humidity"></p>
-                        <p id="wind"></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hourly Forecast -->
-            <div id="hourly-forecast" class="weather-section mb-4">
-                <h3>Hourly Forecast</h3>
-                <div class="hourly-container"></div>
-            </div>
-
-            <!-- Daily Forecast -->
-            <div id="daily-forecast" class="weather-section">
-                <h3>5-Day Forecast</h3>
-                <div class="daily-container"></div>
+    <div class="content-box">
+        <div id="locationDisplay"></div>
+        <div id="aqiData" class="mt-4">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     </div>
@@ -52,130 +22,77 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="js/navigation.js"></script>
     <script>
-        // Initialize navigation
+        const AIRNOW_API_KEY = '9C257C20-E02E-43E8-A6B7-909DF4E964AC';
+
         document.addEventListener('DOMContentLoaded', () => {
             Navigation.createNavigation('navigationContainer');
-        });
-    
-        const OPENWEATHER_API_KEY = 'c1ebc435fc4c558d9501e772be6e7a35';
-        let currentUnit = localStorage.getItem('temperatureUnit') || 'fahrenheit';
+            const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
+            const locationDisplay = document.getElementById('locationDisplay');
+            const aqiData = document.getElementById('aqiData');
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const storedLocation = JSON.parse(localStorage.getItem('weatherLocation'));
-            if (storedLocation) {
-                document.getElementById('location-info').textContent = `Weather for ${storedLocation.name}`;
-                await loadWeatherData(storedLocation.lat, storedLocation.lon);
+            if (locationData) {
+                locationDisplay.innerHTML = `<h3>Air Quality for: ${locationData.name}</h3>`;
+                getAirQualityData(locationData.lat, locationData.lon);
             } else {
-                document.getElementById('location-info').innerHTML = 
-                    '<p class="text-danger">No location selected. Please return to the home page to select a location.</p>';
+                locationDisplay.innerHTML = '<h3>No location selected</h3>';
+                aqiData.innerHTML = `
+                    <div class="alert alert-info" role="alert">
+                        Please select a location on the home page first.
+                    </div>`;
             }
         });
 
-        async function loadWeatherData(lat, lon) {
+        async function getAirQualityData(lat, lon) {
             try {
-                const currentResponse = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`
-                );
-                const currentData = await currentResponse.json();
-
-                const forecastResponse = await fetch(
-                    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`
-                );
-                const forecastData = await forecastResponse.json();
-
-                displayCurrentWeather(currentData);
-                displayHourlyForecast(forecastData.list.slice(0, 8));
-                displayDailyForecast(forecastData.list);
+                const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${lat}&longitude=${lon}&distance=50&API_KEY=${AIRNOW_API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                displayAirQuality(data);
             } catch (error) {
-                console.error('Error loading weather data:', error);
-                document.getElementById('location-info').innerHTML = 
-                    '<p class="text-danger">Error loading weather data. Please try again later.</p>';
+                console.error('Error fetching air quality data:', error);
+                document.getElementById('aqiData').innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        Error fetching air quality data: ${error.message}
+                    </div>`;
             }
         }
 
-        function displayCurrentWeather(data) {
-            document.getElementById('current-temp').textContent = `${convertTemperature(data.main.temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
-            document.getElementById('current-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-            document.getElementById('current-conditions').textContent = data.weather[0].description;
-            document.getElementById('feels-like').textContent = `Feels like: ${convertTemperature(data.main.feels_like)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
-            document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
-            document.getElementById('wind').textContent = `Wind: ${Math.round(data.wind.speed)} mph`;
+        function displayAirQuality(data) {
+            const aqiData = document.getElementById('aqiData');
+            if (data && data.length > 0) {
+                const aqi = data[0].AQI;
+                const category = getAQICategory(aqi);
+                aqiData.innerHTML = `
+                    <div class="card mb-4" style="border-left: 5px solid ${category.color}">
+                        <div class="card-body">
+                            <h4 class="card-title">Air Quality Index</h4>
+                            <h5 class="card-subtitle mb-2">${category.category}</h5>
+                            <p class="card-text">${category.description}</p>
+                        </div>
+                    </div>`;
+            } else {
+                aqiData.innerHTML = `
+                    <div class="alert alert-warning" role="alert">
+                        No air quality data available for this location.
+                    </div>`;
+            }
         }
 
-        function displayHourlyForecast(hourlyData) {
-            const container = document.querySelector('.hourly-container');
-            container.innerHTML = '';
-
-            hourlyData.forEach(hour => {
-                const time = new Date(hour.dt * 1000);
-                const temp = Math.round(hour.main.temp);
-                const icon = hour.weather[0].icon;
-                const description = hour.weather[0].description;
-
-                const hourDiv = document.createElement('div');
-                hourDiv.className = 'hour-forecast';
-                hourDiv.innerHTML = `
-                    <div class="time">${time.getHours()}:00</div>
-                    <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${description}" class="weather-icon-small">
-                    <div class="temp">${convertTemperature(temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
-                `;
-                container.appendChild(hourDiv);
-            });
-        }
-
-        function displayDailyForecast(forecastList) {
-            const container = document.querySelector('.daily-container');
-            container.innerHTML = '';
-
-            const dailyData = {};
-            forecastList.forEach(item => {
-                const date = new Date(item.dt * 1000).toLocaleDateString();
-                if (!dailyData[date]) {
-                    dailyData[date] = {
-                        temps: [],
-                        icons: [],
-                        descriptions: [],
-                        date: new Date(item.dt * 1000)
-                    };
-                }
-                dailyData[date].temps.push(item.main.temp);
-                dailyData[date].icons.push(item.weather[0].icon);
-                dailyData[date].descriptions.push(item.weather[0].description);
-            });
-
-            Object.values(dailyData).slice(0, 5).forEach(day => {
-                const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
-                const avgTemp = Math.round(day.temps.reduce((a, b) => a + b, 0) / day.temps.length);
-                const mostFrequentIcon = day.icons.sort((a,b) =>
-                    day.icons.filter(v => v === a).length - day.icons.filter(v => v === b).length
-                ).pop();
-                const mostFrequentDescription = day.descriptions.sort((a,b) =>
-                    day.descriptions.filter(v => v === a).length - day.descriptions.filter(v => v === b).length
-                ).pop();
-
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'day-forecast';
-                dayDiv.innerHTML = `
-                    <div class="day">${dayName}</div>
-                    <img src="https://openweathermap.org/img/wn/${mostFrequentIcon}@2x.png" alt="${mostFrequentDescription}" class="weather-icon-small">
-                    <div class="temp">${convertTemperature(avgTemp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
-                `;
-                container.appendChild(dayDiv);
-            });
-        }
-
-        function convertTemperature(fahrenheit) {
-            return currentUnit === 'celsius' ? Math.round((fahrenheit - 32) * 5/9) : Math.round(fahrenheit);
-        }
-
-        function setTemperatureUnit(unit) {
-            currentUnit = unit;
-            localStorage.setItem('temperatureUnit', unit);
-            const storedLocation = JSON.parse(localStorage.getItem('weatherLocation'));
-            if (storedLocation) {
-                loadWeatherData(storedLocation.lat, storedLocation.lon);
+        function getAQICategory(aqi) {
+            if (aqi <= 50) {
+                return { category: 'Good', color: '#00e400', description: 'Air quality is satisfactory, and air pollution poses little or no risk.' };
+            } else if (aqi <= 100) {
+                return { category: 'Moderate', color: '#ffff00', description: 'Air quality is acceptable. However, there may be a risk for some sensitive individuals.' };
+            } else if (aqi <= 150) {
+                return { category: 'Unhealthy for Sensitive Groups', color: '#ff7e00', description: 'Members of sensitive groups may experience health effects.' };
+            } else if (aqi <= 200) {
+                return { category: 'Unhealthy', color: '#ff0000', description: 'Everyone may begin to experience health effects.' };
+            } else if (aqi <= 300) {
+                return { category: 'Very Unhealthy', color: '#8f3f97', description: 'Health alert: everyone may experience more serious health effects.' };
+            } else {
+                return { category: 'Hazardous', color: '#7e0023', description: 'Health warning of emergency conditions: everyone is more likely to be affected.' };
             }
         }
     </script>
 </body>
-</html> 
+</html>

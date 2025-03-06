@@ -57,7 +57,7 @@
             Navigation.createNavigation('navigationContainer');
         });
     
-        const WEATHERBIT_API_KEY = '0cf31f547ee745ada83363995cdd6ae5';
+        const OPENWEATHER_API_KEY = 'c1ebc435fc4c558d9501e772be6e7a35';
         let currentUnit = localStorage.getItem('temperatureUnit') || 'fahrenheit';
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -73,19 +73,19 @@
 
         async function loadWeatherData(lat, lon) {
             try {
+                const currentResponse = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`
+                );
+                const currentData = await currentResponse.json();
+
                 const forecastResponse = await fetch(
-                    `https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=I&hours=48&key=${WEATHERBIT_API_KEY}`
+                    `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`
                 );
                 const forecastData = await forecastResponse.json();
 
-                const minutelyResponse = await fetch(
-                    `https://api.weatherbit.io/v2.0/forecast/minutely?lat=${lat}&lon=${lon}&units=I&key=${WEATHERBIT_API_KEY}`
-                );
-                const minutelyData = await minutelyResponse.json();
-
-                displayCurrentWeather(forecastData.data[0]);
-                displayHourlyForecast(forecastData.data.slice(0, 8));
-                displayDailyForecast(forecastData.data);
+                displayCurrentWeather(currentData);
+                displayHourlyForecast(forecastData.list.slice(0, 8));
+                displayDailyForecast(forecastData.list);
             } catch (error) {
                 console.error('Error loading weather data:', error);
                 document.getElementById('location-info').innerHTML = 
@@ -94,12 +94,12 @@
         }
 
         function displayCurrentWeather(data) {
-            document.getElementById('current-temp').textContent = `${convertTemperature(data.temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
-            document.getElementById('current-icon').src = `https://www.weatherbit.io/static/img/icons/${data.weather.icon}.png`;
-            document.getElementById('current-conditions').textContent = data.weather.description;
-            document.getElementById('feels-like').textContent = `Feels like: ${convertTemperature(data.app_temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
-            document.getElementById('humidity').textContent = `Humidity: ${data.rh}%`;
-            document.getElementById('wind').textContent = `Wind: ${Math.round(data.wind_spd)} mph`;
+            document.getElementById('current-temp').textContent = `${convertTemperature(data.main.temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
+            document.getElementById('current-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+            document.getElementById('current-conditions').textContent = data.weather[0].description;
+            document.getElementById('feels-like').textContent = `Feels like: ${convertTemperature(data.main.feels_like)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
+            document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
+            document.getElementById('wind').textContent = `Wind: ${Math.round(data.wind.speed)} mph`;
         }
 
         function displayHourlyForecast(hourlyData) {
@@ -107,16 +107,16 @@
             container.innerHTML = '';
 
             hourlyData.forEach(hour => {
-                const time = new Date(hour.timestamp_local);
-                const temp = Math.round(hour.temp);
-                const icon = hour.weather.icon;
-                const description = hour.weather.description;
+                const time = new Date(hour.dt * 1000);
+                const temp = Math.round(hour.main.temp);
+                const icon = hour.weather[0].icon;
+                const description = hour.weather[0].description;
 
                 const hourDiv = document.createElement('div');
                 hourDiv.className = 'hour-forecast';
                 hourDiv.innerHTML = `
                     <div class="time">${time.getHours()}:00</div>
-                    <img src="https://www.weatherbit.io/static/img/icons/${icon}.png" alt="${description}" class="weather-icon-small">
+                    <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${description}" class="weather-icon-small">
                     <div class="temp">${convertTemperature(temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
                 `;
                 container.appendChild(hourDiv);
@@ -129,18 +129,18 @@
 
             const dailyData = {};
             forecastList.forEach(item => {
-                const date = new Date(item.timestamp_local).toLocaleDateString();
+                const date = new Date(item.dt * 1000).toLocaleDateString();
                 if (!dailyData[date]) {
                     dailyData[date] = {
                         temps: [],
                         icons: [],
                         descriptions: [],
-                        date: new Date(item.timestamp_local)
+                        date: new Date(item.dt * 1000)
                     };
                 }
-                dailyData[date].temps.push(item.temp);
-                dailyData[date].icons.push(item.weather.icon);
-                dailyData[date].descriptions.push(item.weather.description);
+                dailyData[date].temps.push(item.main.temp);
+                dailyData[date].icons.push(item.weather[0].icon);
+                dailyData[date].descriptions.push(item.weather[0].description);
             });
 
             Object.values(dailyData).slice(0, 5).forEach(day => {
@@ -157,7 +157,7 @@
                 dayDiv.className = 'day-forecast';
                 dayDiv.innerHTML = `
                     <div class="day">${dayName}</div>
-                    <img src="https://www.weatherbit.io/static/img/icons/${mostFrequentIcon}.png" alt="${mostFrequentDescription}" class="weather-icon-small">
+                    <img src="https://openweathermap.org/img/wn/${mostFrequentIcon}@2x.png" alt="${mostFrequentDescription}" class="weather-icon-small">
                     <div class="temp">${convertTemperature(avgTemp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
                 `;
                 container.appendChild(dayDiv);
