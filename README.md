@@ -58,7 +58,7 @@ A comprehensive weather application that provides detailed weather information a
 
 This application uses the following APIs:
 - OpenWeather API for weather data
--Ventusky API for the radar
+- Ventusky API for the radar
 - AirNow API for air quality information
 
 ## Technical Details
