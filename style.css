@@ -528,6 +528,22 @@ p {
     transform: translateY(0);
 }
 
+/* New Icon Colors */
+/* Weather Alert Icon */
+.navalert:hover .walert {
+    color: red !important;
+    /* Red color */
+}
+
+/* Sun Tracker Icon */
+.navsun:hover .sun {
+    color: orange !important; /* Change to desired color */
+}
+
+.navcast:hover .forecast {
+    color: black !important;
+}
+
 /* Custom Icons Animation */
 .nav-card i.fa-satellite-dish { animation-delay: 0.1s; }
 .nav-card i.fa-calendar-alt { animation-delay: 0.2s; }
