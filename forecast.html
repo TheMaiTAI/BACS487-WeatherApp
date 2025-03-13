@@ -111,16 +111,39 @@
                 const temp = Math.round(hour.main.temp);
                 const icon = hour.weather[0].icon;
                 const description = hour.weather[0].description;
-
+                const h = time.getHours();
+                                
                 const hourDiv = document.createElement('div');
                 hourDiv.className = 'hour-forecast';
                 hourDiv.innerHTML = `
-                    <div class="time">${time.getHours()}:00</div>
+                    <div class="time">${timeConvert(h)}</div>
                     <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${description}" class="weather-icon-small">
                     <div class="temp">${convertTemperature(temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
                 `;
                 container.appendChild(hourDiv);
             });
+        }
+
+        function timeConvert(h) {
+            if (h > 12) {
+                const t = `${h - 12}:00 PM`;
+                return t;
+            }
+
+            else if (h < 12) {
+                const t = `${h}:00 AM`;
+                return t;
+            }
+
+            else if (h == 12) {
+                const t = `${h}:00 PM`;
+                return t;
+            }
+
+            else if (h == 0) {
+                const t = `${h + 12}:00 AM`;
+                return t;
+            }
         }
 
         function displayDailyForecast(forecastList) {
