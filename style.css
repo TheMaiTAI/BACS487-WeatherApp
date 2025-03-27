@@ -540,7 +540,7 @@ p {
     color: orange !important; /* Change to desired color */
 }
 
-.navcast:hover .forecast {
+.navblack:hover i {
     color: black !important;
 }
 
