@@ -663,7 +663,7 @@ p {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 100px;
+    min-width: 120px;
     padding: 10px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 8px;
@@ -683,7 +683,7 @@ p {
 
 .day-forecast {
     flex: 1;
-    min-width: 120px;
+    min-width: 140px;
     text-align: center;
     padding: 15px;
     background: rgba(255, 255, 255, 0.5);
@@ -693,6 +693,25 @@ p {
 .day-forecast .day {
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.forecast-details {
+    margin-top: 8px;
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+.detail {
+    margin: 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail i {
+    margin-right: 5px;
+    width: 14px;
+    color: #0984e3;
 }
 
 .btn-group {

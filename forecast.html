@@ -7,6 +7,58 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+        .condition-text {
+            text-transform: capitalize;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .essential-conditions, .secondary-conditions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .essential-conditions p, .secondary-conditions p {
+            margin: 0;
+            padding: 5px 10px;
+            background: rgba(240, 240, 240, 0.5);
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .secondary-conditions {
+            opacity: 0.7;
+        }
+        
+        .hour-forecast, .day-forecast {
+            padding: 10px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .hour-forecast:hover, .day-forecast:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .forecast-details {
+            margin-top: 5px;
+        }
+        
+        .detail {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(240, 240, 240, 0.5);
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+    </style>
 </head>
 <body>
     <div id="navigationContainer"></div>
@@ -29,8 +81,14 @@
                     <div class="conditions">
                         <p id="current-conditions"></p>
                         <p id="feels-like"></p>
-                        <p id="humidity"></p>
-                        <p id="wind"></p>
+                        <div class="essential-conditions">
+                            <p id="humidity"></p>
+                            <p id="wind"></p>
+                        </div>
+                        <div class="secondary-conditions">
+                            <p id="sunrise"><i class="fas fa-sun"></i> Sunrise: N/A</p>
+                            <p id="sunset"><i class="fas fa-moon"></i> Sunset: N/A</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -98,8 +156,16 @@
             document.getElementById('current-icon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
             document.getElementById('current-conditions').textContent = data.weather[0].description;
             document.getElementById('feels-like').textContent = `Feels like: ${convertTemperature(data.main.feels_like)}°${currentUnit === 'celsius' ? 'C' : 'F'}`;
-            document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
-            document.getElementById('wind').textContent = `Wind: ${Math.round(data.wind.speed)} mph`;
+            
+            // Essential conditions
+            document.getElementById('humidity').innerHTML = `<i class="fas fa-water"></i> Humidity: ${data.main.humidity}%`;
+            document.getElementById('wind').innerHTML = `<i class="fas fa-wind"></i> Wind: ${Math.round(data.wind.speed)} mph`;
+            
+            // Secondary conditions
+            const sunriseTime = new Date(data.sys.sunrise * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const sunsetTime = new Date(data.sys.sunset * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('sunrise').innerHTML = `<i class="fas fa-sun"></i> ${sunriseTime}`;
+            document.getElementById('sunset').innerHTML = `<i class="fas fa-moon"></i> ${sunsetTime}`;
         }
 
         function displayHourlyForecast(hourlyData) {
@@ -112,13 +178,18 @@
                 const icon = hour.weather[0].icon;
                 const description = hour.weather[0].description;
                 const h = time.getHours();
+                const humidity = hour.main.humidity;
+                const windSpeed = Math.round(hour.wind.speed);
                                 
                 const hourDiv = document.createElement('div');
                 hourDiv.className = 'hour-forecast';
                 hourDiv.innerHTML = `
                     <div class="time">${timeConvert(h)}</div>
                     <img src="https://openweathermap.org/img/wn/${icon}.png" alt="${description}" class="weather-icon-small">
+                    <div class="condition-text">${description}</div>
                     <div class="temp">${convertTemperature(temp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
+                    <div class="detail"><i class="fas fa-wind"></i> Wind: ${windSpeed} mph</div>
+                    <div class="detail"><i class="fas fa-water"></i> Humidity: ${humidity}%</div>
                 `;
                 container.appendChild(hourDiv);
             });
@@ -158,17 +229,26 @@
                         temps: [],
                         icons: [],
                         descriptions: [],
+                        humidity: [],
+                        windSpeed: [],
+                        precipChance: [],
                         date: new Date(item.dt * 1000)
                     };
                 }
                 dailyData[date].temps.push(item.main.temp);
                 dailyData[date].icons.push(item.weather[0].icon);
                 dailyData[date].descriptions.push(item.weather[0].description);
+                dailyData[date].humidity.push(item.main.humidity);
+                dailyData[date].windSpeed.push(item.wind.speed);
+                dailyData[date].precipChance.push(item.pop || 0);
             });
 
             Object.values(dailyData).slice(0, 5).forEach(day => {
                 const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
                 const avgTemp = Math.round(day.temps.reduce((a, b) => a + b, 0) / day.temps.length);
+                const avgHumidity = Math.round(day.humidity.reduce((a, b) => a + b, 0) / day.humidity.length);
+                const avgWindSpeed = Math.round(day.windSpeed.reduce((a, b) => a + b, 0) / day.windSpeed.length);
+                const maxPrecipChance = Math.round(Math.max(...day.precipChance) * 100);
                 const mostFrequentIcon = day.icons.sort((a,b) =>
                     day.icons.filter(v => v === a).length - day.icons.filter(v => v === b).length
                 ).pop();
@@ -181,7 +261,11 @@
                 dayDiv.innerHTML = `
                     <div class="day">${dayName}</div>
                     <img src="https://openweathermap.org/img/wn/${mostFrequentIcon}@2x.png" alt="${mostFrequentDescription}" class="weather-icon-small">
+                    <div class="condition-text">${mostFrequentDescription}</div>
                     <div class="temp">${convertTemperature(avgTemp)}°${currentUnit === 'celsius' ? 'C' : 'F'}</div>
+                    <div class="detail"><i class="fas fa-wind"></i> Wind: ${avgWindSpeed} mph</div>
+                    <div class="detail"><i class="fas fa-water"></i> Humidity: ${avgHumidity}%</div>
+                    <div class="detail"><i class="fas fa-cloud-rain"></i> Precip: ${maxPrecipChance}%</div>
                 `;
                 container.appendChild(dayDiv);
             });
