@@ -84,7 +84,7 @@
 
             locationDisplay.innerHTML = `<h2 class="text-center mb-4">Precipitation Forecast for ${locationData.name}</h2>`;
 
-            // Fetch current weather conditions
+         /*   // Fetch current weather conditions
             async function getCurrentWeather(lat, lon) {
                 try {
                     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`;
@@ -112,7 +112,7 @@
             
                     locationDisplay.innerHTML += `<div class="text-center mt-3">${weatherIcon} <strong>Currently: ${weatherData.weather[0].description}</strong></div>`;
                 }
-            });
+            });  */
 
             getPrecipitationData(locationData.lat, locationData.lon)
                 .then(data => {
