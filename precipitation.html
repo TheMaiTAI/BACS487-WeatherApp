@@ -84,6 +84,36 @@
 
             locationDisplay.innerHTML = `<h2 class="text-center mb-4">Precipitation Forecast for ${locationData.name}</h2>`;
 
+            // Fetch current weather conditions
+            async function getCurrentWeather(lat, lon) {
+                try {
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching current weather:', error);
+                    return null;
+                }
+            }
+            
+            // Display current weather icon
+            getCurrentWeather(locationData.lat, locationData.lon).then(weatherData => {
+                if (weatherData) {
+                    const mainWeather = weatherData.weather[0].main.toLowerCase();
+                    let weatherIcon = '<i class="fas fa-sun"></i>'; // Default: Sunny
+            
+                    if (mainWeather.includes('rain')) weatherIcon = '<i class="fas fa-cloud-showers-heavy"></i>';
+                    else if (mainWeather.includes('snow')) weatherIcon = '<i class="fas fa-snowflake"></i>';
+                    else if (mainWeather.includes('cloud')) weatherIcon = '<i class="fas fa-cloud"></i>';
+                    else if (mainWeather.includes('thunderstorm')) weatherIcon = '<i class="fas fa-bolt"></i>';
+                    else if (mainWeather.includes('drizzle')) weatherIcon = '<i class="fas fa-cloud-rain"></i>';
+                    else if (mainWeather.includes('clear')) weatherIcon = '<i class="fas fa-sun"></i>';
+            
+                    locationDisplay.innerHTML += `<div class="text-center mt-3">${weatherIcon} <strong>Currently: ${weatherData.weather[0].description}</strong></div>`;
+                }
+            });
+
             getPrecipitationData(locationData.lat, locationData.lon)
                 .then(data => {
                     let html = '<div class="row">';
