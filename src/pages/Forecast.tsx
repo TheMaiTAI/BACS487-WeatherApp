@@ -25,16 +25,21 @@ export default function Forecast() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("daily");
   const [selectedDay, setSelectedDay] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (location) {
       loadForecast();
+    } else {
+      setIsLoading(false);
+      setError("Please select a location first");
     }
   }, [location]);
 
   const loadForecast = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const data = await getForecast(location.lat, location.lon);
       if (data) {
         setForecast(data);
@@ -42,9 +47,11 @@ export default function Forecast() {
         throw new Error("No forecast data received");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to load forecast data";
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "Failed to load forecast data",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -56,6 +63,18 @@ export default function Forecast() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <h2 className="text-2xl font-bold mb-4">Error Loading Forecast</h2>
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Button variant="outline" onClick={loadForecast}>
+          Try Again
+        </Button>
       </div>
     );
   }
@@ -98,7 +117,13 @@ export default function Forecast() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <Card className="bg-card/50 backdrop-blur-sm">
+                <Card 
+                  className={cn(
+                    "bg-card/50 backdrop-blur-sm cursor-pointer",
+                    selectedDay === index && "ring-2 ring-primary"
+                  )}
+                  onClick={() => setSelectedDay(index)}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -111,15 +136,15 @@ export default function Forecast() {
                       </div>
                       <div className="text-right">
                         <p className="text-xl font-bold">
-                          {useFormattedTemperature(day.temp.day)}
+                          {useFormattedTemperature(day.temp_day)}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {useFormattedTemperature(day.temp.night)}
+                          {useFormattedTemperature(day.temp_night)}
                         </p>
                       </div>
                     </div>
                     <div className="mt-2 flex items-center justify-center">
-                      <WeatherIcon condition={day.weather[0].description} size="lg" />
+                      <WeatherIcon condition={day.weather_description} size="lg" />
                     </div>
                   </CardContent>
                 </Card>
@@ -127,7 +152,7 @@ export default function Forecast() {
             ))}
           </div>
 
-          {selectedDay !== null && (
+          {selectedDay !== null && forecast.daily[selectedDay] && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -158,22 +183,30 @@ export default function Forecast() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground/90 dark:text-gray-300">Temperature</p>
-                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">{Math.round(forecast.daily[selectedDay].temp_day)}°C</p>
+                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">
+                        {useFormattedTemperature(forecast.daily[selectedDay].temp_day)}
+                      </p>
                       <p className="text-sm text-muted-foreground/80 dark:text-gray-300">
-                        Night: {Math.round(forecast.daily[selectedDay].temp_night)}°C
+                        Night: {useFormattedTemperature(forecast.daily[selectedDay].temp_night)}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground/90 dark:text-gray-300">Humidity</p>
-                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">{forecast.daily[selectedDay].humidity}%</p>
+                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">
+                        {forecast.daily[selectedDay].humidity}%
+                      </p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground/90 dark:text-gray-300">Wind Speed</p>
-                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">{Math.round(forecast.daily[selectedDay].wind_speed)} km/h</p>
+                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">
+                        {Math.round(forecast.daily[selectedDay].wind_speed)} km/h
+                      </p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground/90 dark:text-gray-300">Precipitation</p>
-                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">{Math.round(forecast.daily[selectedDay].pop)}%</p>
+                      <p className="text-2xl font-medium text-foreground/90 dark:text-gray-100">
+                        {Math.round(forecast.daily[selectedDay].pop)}%
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -213,7 +246,7 @@ export default function Forecast() {
                         </div>
                       </div>
                       <div className="mt-2 flex items-center justify-center">
-                        <WeatherIcon condition={hour.weather[0].description} size="lg" />
+                        <WeatherIcon condition={hour.weather_description} size="lg" />
                       </div>
                     </CardContent>
                   </Card>

@@ -170,6 +170,10 @@ export const getForecast = async (lat: number, lon: number, units: 'metric' | 'i
     );
     const data = await response.json();
     
+    if (!data || !data.list) {
+      throw new Error('Invalid forecast data received');
+    }
+    
     // Process hourly forecast (first 8 items)
     const hourly = data.list.slice(0, 8).map((item: any) => ({
       dt: item.dt,
@@ -188,7 +192,7 @@ export const getForecast = async (lat: number, lon: number, units: 'metric' | 'i
       if (!dailyMap.has(date) || (new Date(item.dt * 1000).getHours() >= 12 && new Date(item.dt * 1000).getHours() <= 15)) {
         dailyMap.set(date, {
           dt: item.dt,
-          temp_day: item.main.temp,
+          temp_day: item.main.temp_max,
           temp_night: item.main.temp_min,
           humidity: item.main.humidity,
           wind_speed: item.wind.speed,
