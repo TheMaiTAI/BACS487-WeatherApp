@@ -131,6 +131,8 @@
                 themeLabel.textContent = 'Switch to Dark Mode';
                 if (logoIcon) {
                     logoIcon.style.background = 'linear-gradient(135deg, #31708e 0%, #8fc1e3 100%)';
+                    logoIcon.style.webkitBackgroundClip = 'text';
+                    logoIcon.style.webkitTextFillColor = 'transparent';
                 }
             }
             
@@ -146,6 +148,8 @@
                     localStorage.setItem('theme', 'light');
                     if (logoIcon) {
                         logoIcon.style.background = 'linear-gradient(135deg, #31708e 0%, #8fc1e3 100%)';
+                        logoIcon.style.webkitBackgroundClip = 'text';
+                        logoIcon.style.webkitTextFillColor = 'transparent';
                     }
                 } else {
                     themeIcon.classList.replace('fa-sun', 'fa-moon');
@@ -153,6 +157,8 @@
                     localStorage.setItem('theme', 'dark');
                     if (logoIcon) {
                         logoIcon.style.background = 'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)';
+                        logoIcon.style.webkitBackgroundClip = 'text';
+                        logoIcon.style.webkitTextFillColor = 'transparent';
                     }
                 }
             });
