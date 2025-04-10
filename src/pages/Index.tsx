@@ -13,6 +13,7 @@ import { WeatherIcon } from "@/components/WeatherIcon";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useFormattedTemperature } from "@/lib/temperature";
 
 interface CurrentWeather {
   temperature: number;
@@ -413,68 +414,31 @@ export default function Index() {
 
         {/* Current Weather Card */}
         {currentWeather && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            <Card className="bg-gradient-to-br from-card/50 to-card/30 dark:from-gray-800/50 dark:to-gray-900/30 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-medium text-foreground/90 dark:text-gray-100">Current Weather</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <WeatherIcon 
-                        condition={currentWeather.weather_description} 
-                        size={24}
-                        animated={true}
-                      />
-                      <p className="text-muted-foreground/90 dark:text-gray-200 capitalize">
-                        {currentWeather.weather_description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-4xl font-bold text-foreground/90 dark:text-gray-100">
-                      {Math.round(currentWeather.temperature)}°C
-                    </p>
-                    <p className="text-sm text-muted-foreground/90 dark:text-gray-200">
-                      Feels like {Math.round(currentWeather.feels_like)}°C
-                    </p>
-                  </div>
+          <WeatherCard>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <WeatherIcon condition={currentWeather.weather_description} size="lg" />
+                <div>
+                  <h3 className="text-2xl font-bold">
+                    {useFormattedTemperature(currentWeather.temperature)}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Feels like {useFormattedTemperature(currentWeather.feels_like)}
+                  </p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Droplets className="h-4 w-4 text-blue-500/70 dark:text-blue-400" />
-                      <p className="text-sm text-muted-foreground/90 dark:text-gray-300">Humidity</p>
-                    </div>
-                    <p className="text-xl font-medium text-foreground/90 dark:text-gray-100">
-                      {currentWeather.humidity}%
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Wind className="h-4 w-4 text-cyan-500/70 dark:text-cyan-400" />
-                      <p className="text-sm text-muted-foreground/90 dark:text-gray-300">Wind Speed</p>
-                    </div>
-                    <p className="text-xl font-medium text-foreground/90 dark:text-gray-100">
-                      {Math.round(currentWeather.wind_speed)} km/h
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Sun className="h-4 w-4 text-yellow-500/70 dark:text-yellow-400" />
-                      <p className="text-sm text-muted-foreground/90 dark:text-gray-300">UV Index</p>
-                    </div>
-                    <p className="text-xl font-medium text-foreground/90 dark:text-gray-100">
-                      Moderate
-                    </p>
-                  </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <Wind className="h-5 w-5 mx-auto mb-1" />
+                  <p className="text-sm">{currentWeather.wind_speed} m/s</p>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <div className="text-center">
+                  <Droplets className="h-5 w-5 mx-auto mb-1" />
+                  <p className="text-sm">{currentWeather.humidity}%</p>
+                </div>
+              </div>
+            </div>
+          </WeatherCard>
         )}
       </div>
     </div>

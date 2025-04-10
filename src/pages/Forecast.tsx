@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ChevronLeft, ChevronRight, Sun, Cloud, Droplets, Wind } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useFormattedTemperature } from "@/lib/temperature";
 
 type ForecastData = {
   hourly: HourlyForecast[];
@@ -97,49 +98,28 @@ export default function Forecast() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <Card 
-                  className={cn(
-                    "cursor-pointer transition-all duration-200 hover:bg-muted/30 dark:hover:bg-gray-800/30",
-                    selectedDay === index && "ring-2 ring-primary bg-muted/20 dark:bg-gray-800/20"
-                  )}
-                  onClick={() => setSelectedDay(index)}
-                >
+                <Card className="bg-card/50 backdrop-blur-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium text-foreground/90 dark:text-gray-100">
+                        <h3 className="font-medium">
                           {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' })}
                         </h3>
-                        <p className="text-sm text-muted-foreground/90 dark:text-gray-200">
+                        <p className="text-sm text-muted-foreground">
                           {new Date(day.dt * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </p>
-                        <p className="text-sm text-muted-foreground/80 dark:text-gray-300 mt-1 capitalize">
-                          {day.weather_description}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold">
+                          {useFormattedTemperature(day.temp.day)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {useFormattedTemperature(day.temp.night)}
                         </p>
                       </div>
-                      <WeatherIcon 
-                        condition={day.weather_description} 
-                        size={32}
-                        animated={true}
-                      />
                     </div>
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      <div className="flex items-center space-x-1">
-                        <Sun className="h-4 w-4 text-amber-500/70 dark:text-amber-400" />
-                        <span className="text-sm text-foreground/90 dark:text-gray-200">{Math.round(day.temp_day)}°C</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Droplets className="h-4 w-4 text-blue-500/70 dark:text-blue-400" />
-                        <span className="text-sm text-foreground/90 dark:text-gray-200">{day.humidity}%</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Wind className="h-4 w-4 text-cyan-500/70 dark:text-cyan-400" />
-                        <span className="text-sm text-foreground/90 dark:text-gray-200">{Math.round(day.wind_speed)} km/h</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Cloud className="h-4 w-4 text-gray-500/70 dark:text-gray-400" />
-                        <span className="text-sm text-foreground/90 dark:text-gray-200">{Math.round(day.pop)}%</span>
-                      </div>
+                    <div className="mt-2 flex items-center justify-center">
+                      <WeatherIcon condition={day.weather[0].description} size="lg" />
                     </div>
                   </CardContent>
                 </Card>
@@ -203,8 +183,8 @@ export default function Forecast() {
         </TabsContent>
 
         <TabsContent value="hourly" className="space-y-4">
-          <ScrollArea className="h-[400px] rounded-md border dark:border-gray-700">
-            <div className="p-4 space-y-4">
+          <ScrollArea className="h-[500px]">
+            <div className="space-y-4">
               {forecast.hourly.map((hour, index) => (
                 <motion.div
                   key={hour.dt}
@@ -212,36 +192,28 @@ export default function Forecast() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <Card className="bg-card/30 dark:bg-gray-800/30 backdrop-blur-sm">
+                  <Card className="bg-card/50 backdrop-blur-sm">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-medium text-foreground/90 dark:text-gray-100">
-                            {new Date(hour.dt * 1000).toLocaleTimeString('en-US', { 
-                              hour: 'numeric',
-                              hour12: true
-                            })}
+                          <h3 className="font-medium">
+                            {new Date(hour.dt * 1000).toLocaleTimeString('en-US', { hour: 'numeric' })}
                           </h3>
-                          <p className="text-sm text-muted-foreground/80 dark:text-gray-300 mt-1 capitalize">
-                            {hour.weather_description}
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(hour.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' })}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <WeatherIcon 
-                            condition={hour.weather_description} 
-                            size={24}
-                            animated={true}
-                          />
-                          <span className="font-medium text-foreground/90 dark:text-gray-100">{Math.round(hour.temp)}°C</span>
-                          <div className="flex items-center space-x-1">
-                            <Droplets className="h-4 w-4 text-blue-500/70 dark:text-blue-400" />
-                            <span className="text-sm text-foreground/90 dark:text-gray-200">{hour.humidity}%</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Wind className="h-4 w-4 text-cyan-500/70 dark:text-cyan-400" />
-                            <span className="text-sm text-foreground/90 dark:text-gray-200">{Math.round(hour.wind_speed)} km/h</span>
-                          </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold">
+                            {useFormattedTemperature(hour.temp)}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Feels like {useFormattedTemperature(hour.feels_like)}
+                          </p>
                         </div>
+                      </div>
+                      <div className="mt-2 flex items-center justify-center">
+                        <WeatherIcon condition={hour.weather[0].description} size="lg" />
                       </div>
                     </CardContent>
                   </Card>
