@@ -736,14 +736,4 @@ p {
     .day-forecast {
         min-width: 140px;
     }
-    .navbar-nav .nav-link {
-        transition: background 0.3s, color 0.3s;
-        border-radius: 0.5rem;
-    }
-    
-    .navbar-nav .nav-link:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-    }
-    
 }

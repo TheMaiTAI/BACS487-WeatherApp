@@ -1,14 +1,18 @@
 class Navigation {
     static createNavigation(containerId) {
+        // Check if we're on index.html and have location data
         const currentPath = window.location.pathname;
         const isIndexPage = currentPath.endsWith('index.html') || currentPath.endsWith('/');
         const hasLocation = localStorage.getItem('weatherLocation');
 
+        // Redirect to appropriate page based on conditions
         if (isIndexPage && hasLocation) {
             window.location.href = 'forecast.html';
             return;
         } else if (!isIndexPage && !hasLocation) {
-            alert('Please select a location first.');
+            // Show error message before redirecting
+            const errorMessage = 'Please select a location first.';
+            alert(errorMessage);
             window.location.href = 'index.html';
             return;
         }
@@ -17,38 +21,49 @@ class Navigation {
         if (!container) return;
 
         const nav = document.createElement('nav');
-        nav.className = 'navbar navbar-expand-lg shadow-sm bg-gradient sticky-top';
-        nav.style.background = 'linear-gradient(90deg, #1e3c72, #2a5298)';
+        nav.className = 'navbar navbar-expand-lg navbar-dark bg-dark';
         nav.innerHTML = `
             <div class="container-fluid">
-                <a class="navbar-brand text-white fw-bold" href="index.html">
-                    <i class="fas fa-cloud-sun me-2"></i>WeatherApp
-                </a>
-                <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" href="index.html">Weather App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        ${Navigation.navItem('forecast.html', 'fas fa-cloud-sun', 'Forecast')}
-                        ${Navigation.navItem('radar.html', 'fas fa-broadcast-tower', 'Radar')}
-                        ${Navigation.navItem('precipitation.html', 'fas fa-cloud-rain', 'Precipitation')}
-                        ${Navigation.navItem('sun-tracker.html', 'fas fa-sun', 'Sun Tracker')}
-                        ${Navigation.navItem('air-quality.html', 'fas fa-wind', 'Air Quality')}
-                        ${Navigation.navItem('weather-alerts.html', 'fas fa-exclamation-triangle', 'Alerts')}
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="forecast.html">
+                                <i class="fas fa-cloud-sun"></i> Forecast
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="radar.html">
+                                <i class="fas fa-broadcast-tower"></i> Radar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="precipitation.html">
+                                <i class="fas fa-cloud-rain"></i> Precipitation
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sun-tracker.html">
+                                <i class="fas fa-sun"></i> Sun Tracker
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="air-quality.html">
+                                <i class="fas fa-wind"></i> Air Quality
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="weather-alerts.html">
+                                <i class="fas fa-exclamation-triangle"></i> Weather Alerts
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
         `;
         container.appendChild(nav);
-    }
-
-    static navItem(href, iconClass, label) {
-        return `
-            <li class="nav-item">
-                <a class="nav-link text-white px-3" href="${href}">
-                    <i class="${iconClass} me-2"></i>${label}
-                </a>
-            </li>
-        `;
     }
 }
