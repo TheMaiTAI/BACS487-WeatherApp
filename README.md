@@ -1,126 +1,115 @@
-# BACS487 Weather App
+# Weather App
 
-A modern, responsive weather application built with React, TypeScript, and Tailwind CSS. This application provides real-time weather data, forecasts, and various weather-related features with a beautiful, user-friendly interface.
+A comprehensive weather application that provides detailed weather information and forecasts through an intuitive web interface.
 
 ## Features
 
-- 🌤️ Real-time weather data
-- 📍 Location-based weather information
-- 📊 Detailed weather forecasts
-- 🗺️ Interactive weather maps
-- 🌡️ Temperature tracking
-- 💨 Wind speed and direction
-- 💧 Humidity and precipitation data
-- 🌅 Sunrise and sunset times
-- 🎨 Dark/Light theme support
-- 📱 Fully responsive design
+### 1. Current Weather
+- Real-time weather conditions
+- Temperature display (switchable between °C and °F)
+- Humidity levels
+- Wind speed
+- "Feels like" temperature
+- Weather condition icons and descriptions
 
-## Tech Stack
+### 2. Weather Forecast
+- 5-day weather forecast
+- Hourly forecast for the next 8 hours
+- Detailed temperature trends
+- Weather condition predictions
+- Interactive temperature unit toggle (°C/°F)
 
-- React
-- TypeScript
-- Tailwind CSS
-- Framer Motion (Animations)
-- React Router (Navigation)
-- OpenWeather API (Weather Data)
-- Leaflet (Maps)
-- Lucide Icons
+### 3. Radar
+- Live weather radar map
+- Real-time precipitation tracking
+- Interactive radar visualization
 
-## Getting Started
+### 4. Precipitation Forecast
+- Detailed precipitation predictions
+- Rain and snow forecasts
+- Probability of precipitation
+- Visual precipitation intensity indicators
 
-### Prerequisites
+### 5. Sun Tracker
+- Sunrise and sunset times
+- UV index monitoring
+- Sun position tracking
+- Daylight duration information
 
-- Node.js (v16 or higher)
-- npm or yarn
-- OpenWeather API key
+### 6. Air Quality
+- Real-time Air Quality Index (AQI)
+- Air quality alerts and warnings
+- Pollutant level monitoring
+- Health recommendations based on air quality
 
-### Installation
+### 7. Weather Alerts
+- Severe weather warnings
+- Real-time weather alerts
+- Emergency notifications
+- Location-based alert system
 
-1. Clone the repository:
-```bash
-git clone https://github.com/TheMaiTAI/BACS487-WeatherApp.git
-cd BACS487-WeatherApp
-```
+## Setup
 
-2. Install dependencies:
-```bash
-npm install
-# or
-yarn install
-```
+1. Clone the repository
+2. Open index.html in a web browser
+3. Allow location access for local weather information (optional)
 
-3. Create a `.env` file in the root directory and add your OpenWeather API key:
-```env
-VITE_OPENWEATHER_API_KEY=your_api_key_here
-```
+## API Integration
 
-4. Start the development server:
-```bash
-npm run dev
-# or
-yarn dev
-```
+This application uses the following APIs:
+- OpenWeather API for weather data
+- Ventusky API for the radar
+- AirNow API for air quality information
 
-## Project Structure
+## Technical Details
 
-```
-src/
-├── components/     # Reusable UI components
-├── pages/         # Application pages
-├── lib/          # Utility functions and API
-├── hooks/        # Custom React hooks
-└── styles/       # Global styles
-```
+### Built With
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap 5.0.2
+- Font Awesome 5.15.3
 
-## Key Features
+### Features
+- Responsive design for all devices
+- Local storage for user preferences
+- Real-time data updates
+- Interactive user interface
+- Location-based services
 
-### Location Selection
-- Automatic location detection
-- Manual location search
-- Location persistence
-- Location-based weather data
+## Usage
 
-### Weather Data
-- Current weather conditions
-- Hourly forecasts
-- Daily forecasts
-- Weather alerts
-- UV index
-- Air quality
+1. **Location Selection**
+   - Enter a city name or ZIP code
+   - Use current location button for local weather
 
-### Interactive Maps
-- Weather radar
-- Precipitation maps
-- Temperature maps
-- Wind maps
+2. **Temperature Units**
+   - Toggle between Celsius and Fahrenheit
+   - Preference is saved for future visits
 
-### User Experience
-- Smooth animations
-- Responsive design
-- Dark/Light theme
-- Loading states
-- Error handling
+3. **Navigation**
+   - Use the navigation menu to access different features
+   - Each section provides specific weather-related information
 
-## Contributing
+## Browser Compatibility
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+The application is compatible with modern web browsers including:
+- Google Chrome
+- Mozilla Firefox
+- Microsoft Edge
+- Safari
+
+## Privacy
+
+The application:
+- Requests location permission for accurate weather data
+- Stores preferences locally
+- Does not share personal information
+
+## Support
+
+For support or questions about the Weather App, please open an issue in the repository.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- OpenWeather API for weather data
-- Lucide for beautiful icons
-- Framer Motion for smooth animations
-- Tailwind CSS for styling
-- React community for amazing tools and libraries
-
-## Contact
-
-For any questions or suggestions, please open an issue in the repository. 
+This project is open source and available under the MIT License. Site

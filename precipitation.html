@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+    <title>Precipitation Forecast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .weather-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .precipitation-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #4a90e2;
+        }
+        .probability-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .probability-fill {
+            height: 100%;
+            background-color: #4a90e2;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="navigationContainer"></div>
+    <div class="content-box">
+        <div id="locationDisplay"></div>
+        <div id="precipitationData" class="mt-4">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/navigation.js"></script>
+    <script type="module">
+        // Initialize navigation
+        Navigation.createNavigation('navigationContainer');
+
+        const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
+        const locationDisplay = document.getElementById('locationDisplay');
+        const precipitationData = document.getElementById('precipitationData');
+
+        const OPENWEATHER_API_KEY = 'c1ebc435fc4c558d9501e772be6e7a35';
+
+        async function getPrecipitationData(lat, lon) {
+            try {
+                const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching precipitation data:', error);
+                throw error;
+            }
+        }
+
+        function displayPrecipitation() {
+            if (!locationData || !locationData.lat || !locationData.lon) {
+                locationDisplay.innerHTML = '<p class="text-center">Please select a location from the home page first.</p>';
+                precipitationData.innerHTML = '';
+                return;
+            }
+
+            locationDisplay.innerHTML = `<h2 class="text-center mb-4">Precipitation Forecast for ${locationData.name}</h2>`;
+
+            // Fetch current weather conditions
+            async function getCurrentWeather(lat, lon) {
+                try {
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${OPENWEATHER_API_KEY}`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching current weather:', error);
+                    return null;
+                }
+            }
+            
+            // Display current weather icon
+            getCurrentWeather(locationData.lat, locationData.lon).then(weatherData => {
+                if (weatherData) {
+                    const mainWeather = weatherData.weather[0].main.toLowerCase();
+                    let weatherIcon = '<i class="fas fa-sun"></i>'; // Default: Sunny
+            
+                    if (mainWeather.includes('rain')) weatherIcon = '<i class="fas fa-cloud-showers-heavy"></i>';
+                    else if (mainWeather.includes('snow')) weatherIcon = '<i class="fas fa-snowflake"></i>';
+                    else if (mainWeather.includes('cloud')) weatherIcon = '<i class="fas fa-cloud"></i>';
+                    else if (mainWeather.includes('thunderstorm')) weatherIcon = '<i class="fas fa-bolt"></i>';
+                    else if (mainWeather.includes('drizzle')) weatherIcon = '<i class="fas fa-cloud-rain"></i>';
+                    else if (mainWeather.includes('clear')) weatherIcon = '<i class="fas fa-sun"></i>';
+            
+                    locationDisplay.innerHTML += `<div class="text-center mt-3">${weatherIcon} <strong>Currently: ${weatherData.weather[0].description}</strong></div>`;
+                }
+            }); 
+
+            getPrecipitationData(locationData.lat, locationData.lon)
+                .then(data => {
+                    let html = '<div class="row">';
+                    
+                    // Group forecast data by day
+                    const dailyForecasts = data.list.reduce((acc, forecast) => {
+                        const date = new Date(forecast.dt * 1000);
+                        const day = date.toLocaleDateString();
+                        
+                        if (!acc[day]) {
+                            acc[day] = {
+                                date: date,
+                                precipitation: 0,
+                                probability: 0,
+                                count: 0,
+                                type: 'none' // Will be updated to 'rain' or 'snow'
+                            };
+                        }
+                        
+                        // Add precipitation data (rain + snow if available)
+                        const rain = forecast.rain ? forecast.rain['3h'] || 0 : 0;
+                        const snow = forecast.snow ? forecast.snow['3h'] || 0 : 0;
+                        acc[day].precipitation += rain + snow;
+                        acc[day].probability += forecast.pop; // Probability of precipitation
+                        acc[day].count++;
+                        
+                        // Determine precipitation type
+                        if (snow > 0) acc[day].type = 'snow';
+                        else if (rain > 0) acc[day].type = 'rain';
+                        
+                        return acc;
+                    }, {});
+
+                    // Create forecast cards
+                    Object.values(dailyForecasts).slice(0, 5).forEach(day => {
+                        const avgProbability = (day.probability / day.count) * 100;
+                        const totalPrecipitation = day.precipitation.toFixed(2);
+                        const dateStr = day.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                        
+                        const icon = day.type === 'snow' ? 'fa-snowflake' : 'fa-cloud-rain';
+                        const precipType = day.type === 'snow' ? 'Snow' : 'Rain';
+                        
+                        html += `
+                            <div class="col-md-4 mb-4">
+                                <div class="weather-section">
+                                    <div class="text-center">
+                                        <div class="precipitation-icon">
+                                            <i class="fas ${icon}"></i>
+                                        </div>
+                                        <h4>${dateStr}</h4>
+                                        <p class="mb-2">${precipType} Amount: ${totalPrecipitation} mm</p>
+                                        <p class="mb-2">Probability: ${Math.round(avgProbability)}%</p>
+                                        <div class="probability-bar">
+                                            <div class="probability-fill" style="width: ${avgProbability}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+
+                    html += '</div>';
+                    precipitationData.innerHTML = html;
+                })
+                .catch(error => {
+                    precipitationData.innerHTML = `
+                        <div class="alert alert-danger text-center" role="alert">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Error loading precipitation data: ${error.message}
+                        </div>`;
+                });
+        }
+
+        // Load precipitation data when the page loads
+        document.addEventListener('DOMContentLoaded', displayPrecipitation);
+    </script>
+</body>
+</html>
