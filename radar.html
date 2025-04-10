@@ -13,29 +13,26 @@
     <div id="navigationContainer"></div>
 
     <div class="content-box main">
-        <div id="locationDisplay"></div>
+        <p>View live weather radar updates.</p>
         
-        <div class="d-flex justify-content-end mb-3">
-            <button id="openRadarBtn" class="btn btn-primary" onclick="openRadarInNewTab()">
-                <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
-            </button>
-        </div>
-        
-        <div class="radar-container position-relative">
-            <div class="radar-wrapper">
-                <iframe 
-                    id="radarIframe"
-                    frameborder="0" 
-                    allowfullscreen
-                    loading="lazy"
-                    class="radar-frame"
-                ></iframe>
+        <div class="radar-container">
+            <div style="display:block!important;position:relative!important;max-width:177.612vh!important;margin:auto!important;padding:0!important;border:0!important">
+                <div style="display:block!important;position:relative!important;width:100%!important;height:0!important;box-sizing:content-box!important;margin:0!important;border:0!important;padding:0 0 56.303%!important;left:0!important;top:0!important;right:0!important;bottom:0!important">
+                    <iframe 
+                        id="radarIframe"
+                        frameborder="0" 
+                        allowfullscreen
+                        style="display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;right:auto!important;bottom:auto!important"
+                        loading="lazy"
+                    ></iframe>
+                </div>
             </div>
-            <div id="mapLoading" class="radar-loading">
+            <div id="mapLoading">
                 <div class="spinner-border text-light" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
+            <div id="locationDisplay"></div>
         </div>
     </div>
 
@@ -43,11 +40,10 @@
         const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
         const locationDisplay = document.getElementById('locationDisplay');
         const mapLoading = document.getElementById('mapLoading');
-        let iframeSrc = '';
-        
+        const iframeSrc = `https://embed.ventusky.com/?p=${locationData.lat};${locationData.lon};11&l=radar&pin=${locationData.lat};${locationData.lon};dot;${encodeURIComponent(locationData.name)}`;
+        document.getElementById('radarIframe').src = iframeSrc;
+
         if (locationData) {
-            iframeSrc = `https://embed.ventusky.com/?p=${locationData.lat};${locationData.lon};11&l=radar&pin=${locationData.lat};${locationData.lon};dot;${encodeURIComponent(locationData.name)}`;
-            document.getElementById('radarIframe').src = iframeSrc;
             locationDisplay.innerHTML = `<h3>Showing radar for: ${locationData.name}</h3>`;
             
             // Set timeout for loading
@@ -92,13 +88,6 @@
                 </div>
             `;
             mapLoading.style.display = 'none';
-            document.getElementById('openRadarBtn').style.display = 'none';
-        }
-        
-        function openRadarInNewTab() {
-            if (iframeSrc) {
-                window.open(iframeSrc, '_blank');
-            }
         }
     </script>
 
