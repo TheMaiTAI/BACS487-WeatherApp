@@ -74,14 +74,6 @@ export function Navbar() {
                   <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                     Weather App
                   </h2>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setIsOpen(false)}
-                    className="h-10 w-10 hover:bg-accent/50"
-                  >
-                    <X className="h-6 w-6" />
-                  </Button>
                 </div>
                 <nav className="flex flex-col p-4 gap-2">
                   {navItems.map((item) => (
