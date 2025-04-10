@@ -29,12 +29,15 @@ class Navigation {
         if (!container) return;
 
         const nav = document.createElement('nav');
-        nav.className = 'navbar navbar-dark sidebar';
+        nav.className = 'navbar navbar-dark sidebar collapsed';
         
         nav.innerHTML = `
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
                 <i class="fas fa-cloud-sun"></i>Weather App
             </a>
+            <button class="navbar-toggler mobile-toggle" type="button" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav flex-column w-100">
                     <li class="nav-item">
@@ -76,9 +79,6 @@ class Navigation {
                     </button>
                 </div>
             </div>
-            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
         `;
         container.appendChild(nav);
         
@@ -89,6 +89,13 @@ class Navigation {
             if (link.getAttribute('href') === currentPage) {
                 link.classList.add('active');
             }
+        });
+
+        // Add event listener to toggle mobile navigation
+        const toggleButton = nav.querySelector('.mobile-toggle');
+        toggleButton.addEventListener('click', () => {
+            nav.classList.toggle('collapsed');
+            nav.classList.toggle('expanded');
         });
 
         // Initialize theme toggle functionality
