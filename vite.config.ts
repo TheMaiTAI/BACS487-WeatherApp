@@ -20,4 +20,13 @@ export default defineConfig(({ mode }) => ({
     },
   },
   base: '/BACS487-WeatherApp/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
+  }
 }));

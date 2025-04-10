@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 type TemperatureUnit = 'celsius' | 'fahrenheit';
 
@@ -10,7 +10,14 @@ interface TemperatureContextType {
 const TemperatureContext = createContext<TemperatureContextType | undefined>(undefined);
 
 export function TemperatureProvider({ children }: { children: ReactNode }) {
-  const [unit, setUnit] = useState<TemperatureUnit>('celsius');
+  const [unit, setUnit] = useState<TemperatureUnit>(() => {
+    const savedUnit = localStorage.getItem('temperature-unit');
+    return (savedUnit as TemperatureUnit) || 'celsius';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('temperature-unit', unit);
+  }, [unit]);
 
   const toggleUnit = () => {
     setUnit(prev => prev === 'celsius' ? 'fahrenheit' : 'celsius');
