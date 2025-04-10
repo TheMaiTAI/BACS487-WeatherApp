@@ -136,6 +136,42 @@
                 display: none;
             }
         }
+        
+        /* Critical inline styles to fix scrolling on GitHub Pages */
+        .daily-container {
+            transform: translate3d(0,0,0) !important;
+            -webkit-overflow-scrolling: touch !important;
+            overflow-x: auto !important;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            scroll-snap-type: x mandatory;
+            position: relative !important;
+            left: 0 !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            scroll-behavior: auto !important;
+        }
+        
+        .daily-container::before,
+        .daily-container::after {
+            display: none !important;
+        }
+        
+        .day-forecast {
+            flex: 0 0 auto !important;
+            min-width: 140px !important;
+            width: 140px !important;
+            margin-right: 15px !important;
+            scroll-snap-align: start;
+        }
+        
+        @media (max-width: 768px) {
+            .day-forecast:first-child {
+                margin-left: 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -380,6 +416,9 @@
         function displayDailyForecast(forecastList) {
             const container = document.querySelector('.daily-container');
             container.innerHTML = '';
+            
+            // Reset scroll position right away
+            container.scrollLeft = 0;
 
             const dailyData = {};
             forecastList.forEach(item => {
@@ -403,7 +442,7 @@
                 dailyData[date].precipChance.push(item.pop || 0);
             });
 
-            Object.values(dailyData).slice(0, 5).forEach(day => {
+            Object.values(dailyData).slice(0, 5).forEach((day, index) => {
                 const dayName = day.date.toLocaleDateString('en-US', { weekday: 'short' });
                 const avgTemp = Math.round(day.temps.reduce((a, b) => a + b, 0) / day.temps.length);
                 const avgHumidity = Math.round(day.humidity.reduce((a, b) => a + b, 0) / day.humidity.length);
@@ -418,6 +457,10 @@
 
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'day-forecast';
+                // Add special class to the first item
+                if (index === 0) {
+                    dayDiv.classList.add('first-day');
+                }
                 dayDiv.innerHTML = `
                     <div class="day font-weight-bold">${dayName}</div>
                     <img src="https://openweathermap.org/img/wn/${mostFrequentIcon}@2x.png" alt="${mostFrequentDescription}" class="weather-icon-small">
@@ -432,19 +475,36 @@
                 container.appendChild(dayDiv);
             });
             
-            // Force scroll to left
-            container.scrollLeft = 0;
-            
-            // Check if scroll is needed
-            setTimeout(() => {
-                container.scrollLeft = 0; // Make sure it's scrolled to the beginning
+            // Multi-attempt approach to force scroll to left
+            function forceScrollToLeft() {
+                // Reset scroll multiple times with increasing delays
+                container.scrollLeft = 0;
                 
+                // Try multiple times to ensure it works
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        container.scrollLeft = 0;
+                        // Also try setting scroll with style property
+                        container.style.scrollLeft = "0px";
+                    }, i * 200); // Try at 0ms, 200ms, 400ms, 600ms, 800ms
+                }
+                
+                // Also check if scrolling is needed
                 if (container.scrollWidth <= container.clientWidth) {
                     container.classList.add('no-scroll-needed');
                 } else {
                     container.classList.remove('no-scroll-needed');
                 }
-            }, 100);
+            }
+            
+            // Call immediately and on window load/resize
+            forceScrollToLeft();
+            window.addEventListener('load', forceScrollToLeft);
+            window.addEventListener('resize', forceScrollToLeft);
+            
+            // Also try to fix on visibility changes and orientation changes
+            document.addEventListener('visibilitychange', forceScrollToLeft);
+            window.addEventListener('orientationchange', forceScrollToLeft);
         }
 
         function convertTemperature(fahrenheit) {

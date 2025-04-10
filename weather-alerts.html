@@ -13,9 +13,16 @@
 
     <div class="content-box main">
         <h1>Weather Alerts</h1>
-        <p>View active weather alerts for your location.</p>
+        <p>View active weather alerts for your location from the National Weather Service.</p>
         
-        <div id="alerts-container"></div>
+        <div id="alerts-loading" class="text-center py-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading weather alerts...</p>
+        </div>
+        
+        <div id="alerts-container" style="display: none;"></div>
         <div class="timestamp">Last updated: <span id="update-time"></span></div>
     </div>
 
@@ -28,25 +35,45 @@
             if (locationData && locationData.lat && locationData.lon) {
                 fetchWeatherAlerts(locationData.lat, locationData.lon);
             } else {
+                document.getElementById('alerts-loading').style.display = 'none';
                 const container = document.getElementById('alerts-container');
+                container.style.display = 'block';
                 container.innerHTML = '<div class="alert">Please select a location on the home page first.</div>';
             }
         });
 
         async function fetchWeatherAlerts(lat, lon) {
+            // Using location-based NWS alerts API
             const endpoint = `https://api.weather.gov/alerts/active?point=${lat},${lon}`;
+            
+            document.getElementById('alerts-loading').style.display = 'block';
+            document.getElementById('alerts-container').style.display = 'none';
             
             try {
                 const response = await fetch(endpoint, {
                     headers: {
-                        'Accept': 'application/geo+json'
+                        'Accept': 'application/geo+json',
+                        'User-Agent': 'WeatherApp/1.0 (weatherapp@example.com)'
                     }
                 });
+                
+                if (!response.ok) {
+                    // For areas outside the US, the API will return 404
+                    if (response.status === 404) {
+                        displayLocationError();
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 updateDisplay(data);
             } catch (error) {
                 console.error('Error fetching alerts:', error);
                 displayError();
+            } finally {
+                document.getElementById('alerts-loading').style.display = 'none';
+                document.getElementById('alerts-container').style.display = 'block';
             }
         }
 
@@ -62,22 +89,107 @@
                 return;
             }
 
+            // Group alerts by event type for better organization
+            const alertsByType = {};
+            
             data.features.forEach(alert => {
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert';
-                alertDiv.innerHTML = `
-                    <h3><i class="fas fa-exclamation-triangle text-warning me-2"></i>${alert.properties.headline}</h3>
-                    <p>${alert.properties.description}</p>
-                    <p><strong>Effective:</strong> ${new Date(alert.properties.effective).toLocaleString()}</p>
-                    <p><strong>Expires:</strong> ${new Date(alert.properties.expires).toLocaleString()}</p>
-                `;
-                container.appendChild(alertDiv);
+                const properties = alert.properties;
+                const event = properties.event;
+                
+                if (!alertsByType[event]) {
+                    alertsByType[event] = [];
+                }
+                
+                alertsByType[event].push(alert);
             });
+            
+            // Create a section for each type of alert
+            for (const [eventType, alerts] of Object.entries(alertsByType)) {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'alert-section mb-4';
+                
+                const sectionTitle = document.createElement('h2');
+                sectionTitle.className = 'alert-section-title mb-3';
+                sectionTitle.textContent = `${eventType} (${alerts.length})`;
+                sectionDiv.appendChild(sectionTitle);
+                
+                alerts.forEach(alert => {
+                    const properties = alert.properties;
+                    
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert';
+                    
+                    // Determine alert icon and color based on severity
+                    let alertIcon = 'exclamation-triangle';
+                    let alertColor = 'warning';
+                    
+                    switch (properties.severity) {
+                        case 'Extreme':
+                            alertIcon = 'radiation';
+                            alertColor = 'danger';
+                            break;
+                        case 'Severe':
+                            alertIcon = 'exclamation-circle';
+                            alertColor = 'danger';
+                            break;
+                        case 'Moderate':
+                            alertIcon = 'exclamation-triangle';
+                            alertColor = 'warning';
+                            break;
+                        case 'Minor':
+                            alertIcon = 'info-circle';
+                            alertColor = 'info';
+                            break;
+                        case 'Unknown':
+                        default:
+                            alertIcon = 'question-circle';
+                            alertColor = 'secondary';
+                    }
+                    
+                    // Format dates
+                    const effectiveDate = new Date(properties.effective).toLocaleString();
+                    const expiresDate = new Date(properties.expires).toLocaleString();
+                    
+                    // Get affected areas
+                    const affectedAreas = properties.areaDesc.split(';').map(area => area.trim());
+                    
+                    // Create alert content
+                    alertDiv.innerHTML = `
+                        <h3><i class="fas fa-${alertIcon} text-${alertColor} me-2"></i>${properties.headline || properties.event}</h3>
+                        <div class="alert-meta">
+                            <span class="alert-severity badge bg-${alertColor} me-2">${properties.severity}</span>
+                            <span class="alert-certainty badge bg-secondary me-2">${properties.certainty}</span>
+                            <span class="alert-urgency badge bg-dark">${properties.urgency}</span>
+                        </div>
+                        <p class="alert-source">Source: ${properties.senderName || 'National Weather Service'}</p>
+                        <div class="alert-areas">
+                            <strong>Affected Areas:</strong> 
+                            <span>${affectedAreas.join(', ')}</span>
+                        </div>
+                        <div class="alert-description">${properties.description}</div>
+                        <div class="alert-instruction">${properties.instruction || ''}</div>
+                        <p><strong>Effective:</strong> ${effectiveDate}</p>
+                        <p><strong>Expires:</strong> ${expiresDate}</p>
+                    `;
+                    sectionDiv.appendChild(alertDiv);
+                });
+                
+                container.appendChild(sectionDiv);
+            }
         }
 
         function displayError() {
             const container = document.getElementById('alerts-container');
             container.innerHTML = '<div class="alert"><i class="fas fa-exclamation-circle text-danger me-2"></i>Error loading weather alerts. Please try again later.</div>';
+            document.getElementById('alerts-loading').style.display = 'none';
+            container.style.display = 'block';
+        }
+        
+        function displayLocationError() {
+            const container = document.getElementById('alerts-container');
+            container.innerHTML = '<div class="alert"><i class="fas fa-map-marker-alt text-warning me-2"></i>This location may be outside of the National Weather Service coverage area (United States and territories). Please try a US location.</div>';
+            document.getElementById('alerts-loading').style.display = 'none';
+            container.style.display = 'block';
         }
     </script>
 </body>

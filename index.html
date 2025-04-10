@@ -14,7 +14,10 @@
     
     <div class="content-box main">
         <div class="text-center mb-5">
-            <h1>WEATHER APP</h1>
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <i class="fas fa-cloud-sun home-logo-icon" style="font-size: 2.2rem; background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-right: 10px;"></i>
+                <h1 class="mb-0">WEATHER APP</h1>
+            </div>
             <p>Your Gateway to Reliable Weather Information.</p>
         </div>
 
@@ -115,6 +118,7 @@
             
             const themeIcon = homepageToggle.querySelector('i');
             const themeLabel = homepageToggle.querySelector('.theme-label');
+            const logoIcon = document.querySelector('.home-logo-icon');
             
             // Check for saved theme preference
             const savedTheme = localStorage.getItem('theme');
@@ -125,6 +129,9 @@
                 document.body.classList.add('light-theme');
                 themeIcon.classList.replace('fa-moon', 'fa-sun');
                 themeLabel.textContent = 'Switch to Dark Mode';
+                if (logoIcon) {
+                    logoIcon.style.background = 'linear-gradient(135deg, #31708e 0%, #8fc1e3 100%)';
+                }
             }
             
             // Add click event
@@ -137,10 +144,16 @@
                     themeIcon.classList.replace('fa-moon', 'fa-sun');
                     themeLabel.textContent = 'Switch to Dark Mode';
                     localStorage.setItem('theme', 'light');
+                    if (logoIcon) {
+                        logoIcon.style.background = 'linear-gradient(135deg, #31708e 0%, #8fc1e3 100%)';
+                    }
                 } else {
                     themeIcon.classList.replace('fa-sun', 'fa-moon');
                     themeLabel.textContent = 'Switch to Light Mode';
                     localStorage.setItem('theme', 'dark');
+                    if (logoIcon) {
+                        logoIcon.style.background = 'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)';
+                    }
                 }
             });
         }
