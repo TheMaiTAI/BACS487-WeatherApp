@@ -9,11 +9,13 @@
     <link rel="stylesheet" href="style.css" />
     <style>
         .sun-info-card {
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--content-bg);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
         }
         .sun-icon {
             font-size: 2.5rem;
@@ -23,7 +25,8 @@
         .info-value {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--text-color);
+            transition: color 0.3s ease;
         }
         .uv-index-indicator {
             padding: 5px 15px;
@@ -31,6 +34,17 @@
             color: white;
             font-weight: bold;
             display: inline-block;
+        }
+        h3, h4 {
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        .text-warning {
+            color: #ffd700 !important;
+        }
+        #uvDescription, #uvWarning {
+            color: var(--text-color);
+            transition: color 0.3s ease;
         }
     </style>
 </head>
@@ -199,67 +213,62 @@
             } else if (uvIndex >= 11) {
                 return {
                     description: 'Extreme',
-                    warning: 'Take all precautions. Avoid sun exposure during midday hours.'
-                };
-            } else {
-                return {
-                    description: 'Unknown',
-                    warning: 'UV index data not available.'
+                    warning: 'Avoid being outside during midday hours. Shirt, sunscreen, and hat are a must.'
                 };
             }
         }
 
-        async function fetchSunData(locationData) {
-            try {
-                const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${locationData.lat}&lng=${locationData.lon}&formatted=0`);
-                const data = await response.json();
-                
-                if (data.status === 'OK') {
-                    updateSunTimes(data.results, locationData);
-                }
-            } catch (error) {
-                console.error('Error fetching sun data:', error);
-            }
-        }
-
-        function updateSunTimes(sunData, locationData) {
-            const sunrise = new Date(sunData.sunrise);
-            const sunset = new Date(sunData.sunset);
-            const solarNoon = new Date(sunData.solar_noon);
+        function fetchSunData(locationData) {
+            const lat = locationData.lat;
+            const lon = locationData.lon;
             const now = new Date();
-
-            // Calculate sun position
-            const sunPosition = SunCalc.getPosition(now, locationData.lat, locationData.lon);
-            const sunAzimuth = Math.round(sunPosition.azimuth * (180/Math.PI));
-            const sunElevation = Math.round(sunPosition.altitude * (180/Math.PI));
-
-            // Update display
-            document.getElementById('sunrise').textContent = sunrise.toLocaleTimeString();
-            document.getElementById('sunset').textContent = sunset.toLocaleTimeString();
-            document.getElementById('solarNoon').textContent = solarNoon.toLocaleTimeString();
-            document.getElementById('sunAzimuth').textContent = `${sunAzimuth}°`;
-            document.getElementById('currentElevation').textContent = `${sunElevation}°`;
-
-            // Calculate and update day length
-            const dayLengthHours = Math.floor(sunData.day_length / 3600);
-            const dayLengthMinutes = Math.floor((sunData.day_length % 3600) / 60);
-            document.getElementById('dayLength').textContent = `${dayLengthHours}h ${dayLengthMinutes}m`;
-
-            // Calculate and display daylight remaining
-            if (now < sunset) {
-                const remainingMs = sunset.getTime() - now.getTime();
-                const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
-                const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                document.getElementById('daylightRemaining').textContent = `${remainingHours}h ${remainingMinutes}m`;
-            } else {
-                document.getElementById('daylightRemaining').textContent = 'No daylight remaining';
+            
+            // Use SunCalc library to get sun position and times
+            const sunPosition = SunCalc.getPosition(now, lat, lon);
+            const sunTimes = SunCalc.getTimes(now, lat, lon);
+            
+            // Update sun position
+            document.getElementById('sunAzimuth').textContent = `${Math.round(sunPosition.azimuth * 180 / Math.PI)}°`;
+            document.getElementById('currentElevation').textContent = `${Math.round(sunPosition.altitude * 180 / Math.PI)}°`;
+            
+            // Format and display sunrise/sunset times
+            const sunriseTime = formatTime(sunTimes.sunrise);
+            const sunsetTime = formatTime(sunTimes.sunset);
+            document.getElementById('sunrise').textContent = sunriseTime;
+            document.getElementById('sunset').textContent = sunsetTime;
+            
+            // Calculate day length
+            const dayLengthMinutes = (sunTimes.sunset - sunTimes.sunrise) / 60000; // milliseconds to minutes
+            const dayLengthHours = Math.floor(dayLengthMinutes / 60);
+            const dayLengthMins = Math.round(dayLengthMinutes % 60);
+            document.getElementById('dayLength').textContent = `${dayLengthHours}h ${dayLengthMins}m`;
+            
+            // Calculate daylight remaining
+            let daylightRemaining = "Night time";
+            if (now < sunTimes.sunrise) {
+                // Before sunrise
+                daylightRemaining = "Waiting for sunrise";
+            } else if (now < sunTimes.sunset) {
+                // Daytime
+                const remainingMinutes = (sunTimes.sunset - now) / 60000;
+                const remainingHours = Math.floor(remainingMinutes / 60);
+                const remainingMins = Math.round(remainingMinutes % 60);
+                daylightRemaining = `${remainingHours}h ${remainingMins}m`;
             }
-
-            // Update sun transit time
-            const transitTime = Math.abs(sunData.day_length / 2);
-            const transitHours = Math.floor(transitTime / 3600);
-            const transitMinutes = Math.floor((transitTime % 3600) / 60);
-            document.getElementById('sunTransit').textContent = `${transitHours}h ${transitMinutes}m`;
+            document.getElementById('daylightRemaining').textContent = daylightRemaining;
+            
+            // Solar noon and transit time
+            document.getElementById('solarNoon').textContent = formatTime(sunTimes.solarNoon);
+            
+            // For transit time, calculate how long the sun is above 0° elevation
+            const transitMinutes = dayLengthMinutes;
+            const transitHours = Math.floor(transitMinutes / 60);
+            const transitMins = Math.round(transitMinutes % 60);
+            document.getElementById('sunTransit').textContent = `${transitHours}h ${transitMins}m`;
+        }
+        
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
     </script>
 </body>

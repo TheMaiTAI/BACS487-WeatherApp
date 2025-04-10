@@ -10,28 +10,35 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .weather-section {
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--content-bg);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
         .precipitation-icon {
             font-size: 2em;
             margin-bottom: 10px;
-            color: #4a90e2;
+            color: var(--input-focus-border);
         }
         .probability-bar {
             height: 8px;
-            background-color: #e9ecef;
+            background-color: var(--input-bg);
             border-radius: 4px;
             overflow: hidden;
             margin: 8px 0;
         }
         .probability-fill {
             height: 100%;
-            background-color: #4a90e2;
+            background-color: var(--input-focus-border);
             transition: width 0.3s ease;
+        }
+        .weather-section h4,
+        .weather-section p {
+            color: var(--text-color);
         }
     </style>
 </head>
