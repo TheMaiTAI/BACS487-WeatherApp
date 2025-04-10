@@ -68,6 +68,13 @@ class Navigation {
                         </a>
                     </li>
                 </ul>
+                
+                <div class="theme-toggle-container mt-auto">
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark/light mode">
+                        <i class="fas fa-moon"></i>
+                        <span class="theme-label">Dark Mode</span>
+                    </button>
+                </div>
             </div>
             <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -81,6 +88,43 @@ class Navigation {
         navLinks.forEach(link => {
             if (link.getAttribute('href') === currentPage) {
                 link.classList.add('active');
+            }
+        });
+
+        // Initialize theme toggle functionality
+        this.initThemeToggle();
+    }
+
+    static initThemeToggle() {
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const themeLabel = themeToggle.querySelector('.theme-label');
+        
+        // Check for saved theme preference or respect OS preference
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // Set initial theme
+        if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+            document.body.classList.add('light-theme');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            themeLabel.textContent = 'Light Mode';
+        }
+        
+        // Add click event
+        themeToggle.addEventListener('click', () => {
+            // Toggle theme
+            const isLightTheme = document.body.classList.toggle('light-theme');
+            
+            // Update icon and text
+            if (isLightTheme) {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                themeLabel.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                themeLabel.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'dark');
             }
         });
     }

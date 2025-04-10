@@ -40,6 +40,14 @@
             </div>
         </form>
 
+        <!-- Theme Toggle -->
+        <div class="theme-toggle-wrapper text-center mt-4">
+            <button id="homepageThemeToggle" class="btn btn-outline-secondary theme-toggle-btn" aria-label="Toggle dark/light mode">
+                <i class="fas fa-moon me-2"></i>
+                <span class="theme-label">Switch to Light Mode</span>
+            </button>
+        </div>
+
         <!-- Current Location Display -->
         <div id="currentLocationDisplay" class="text-center mb-4">
             <div class="alert alert-info d-none" role="alert">
@@ -94,11 +102,48 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script>
         const RADAR_API_KEY = 'prj_live_pk_6660a43192d5efc2aceeaf662ade73a04a2ea0a4';
-const OPENWEATHER_API_KEY = 'c1ebc435fc4c558d9501e772be6e7a35';
+        const OPENWEATHER_API_KEY = 'c1ebc435fc4c558d9501e772be6e7a35';
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeLocationFunctionality();
+            initializeThemeToggle();
         });
+
+        function initializeThemeToggle() {
+            const homepageToggle = document.getElementById('homepageThemeToggle');
+            if (!homepageToggle) return;
+            
+            const themeIcon = homepageToggle.querySelector('i');
+            const themeLabel = homepageToggle.querySelector('.theme-label');
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Set initial theme
+            if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                themeLabel.textContent = 'Switch to Dark Mode';
+            }
+            
+            // Add click event
+            homepageToggle.addEventListener('click', () => {
+                // Toggle theme
+                const isLightTheme = document.body.classList.toggle('light-theme');
+                
+                // Update icon and text
+                if (isLightTheme) {
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                    themeLabel.textContent = 'Switch to Dark Mode';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                    themeLabel.textContent = 'Switch to Light Mode';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        }
 
         function initializeLocationFunctionality() {
             const locationForm = document.getElementById('locationForm');
