@@ -63,7 +63,7 @@
                 const aqi = data[0].AQI;
                 const category = getAQICategory(aqi);
                 aqiData.innerHTML = `
-                    <div class="card mb-4" style="border-left: 5px solid ${category.color}">
+                    <div class="card mb-4 aqi-card" style="border-left: 5px solid ${category.color}">
                         <div class="card-body">
                             <h4 class="card-title">Air Quality Index</h4>
                             <h5 class="card-subtitle mb-2">${category.category}</h5>

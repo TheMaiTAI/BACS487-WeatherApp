@@ -1122,3 +1122,45 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
         padding-bottom: 10px;
     }
 }
+
+/* Air Quality Card Styles */
+.aqi-card {
+    background-color: var(--content-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.aqi-card .card-title,
+.aqi-card .card-subtitle,
+.aqi-card .card-text {
+    color: var(--text-color);
+}
+
+.light-theme .aqi-card {
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.light-theme .aqi-card .card-title,
+.light-theme .aqi-card .card-subtitle,
+.light-theme .aqi-card .card-text {
+    color: var(--text-color);
+}
+
+/* Make alert messages theme-compatible */
+.alert {
+    background-color: var(--content-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.alert-info {
+    border-left: 5px solid #17a2b8;
+}
+
+.alert-warning {
+    border-left: 5px solid #ffc107;
+}
+
+.alert-danger {
+    border-left: 5px solid #dc3545;
+}
