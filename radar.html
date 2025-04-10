@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Radar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,92 +13,114 @@
     <div id="navigationContainer"></div>
 
     <div class="content-box main">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <p>View live weather radar updates.</p>
-            <button id="openRadarBtn" class="btn btn-primary" onclick="openRadarInNewTab()">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+            <p class="mb-3 mb-md-0">View live weather radar updates.</p>
+            <button id="openRadarBtn" class="btn btn-primary w-100 w-md-auto" onclick="openRadarInNewTab()">
                 <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
             </button>
         </div>
         
         <div class="radar-container">
-            <div style="display:block!important;position:relative!important;max-width:177.612vh!important;margin:auto!important;padding:0!important;border:0!important">
-                <div style="display:block!important;position:relative!important;width:100%!important;height:0!important;box-sizing:content-box!important;margin:0!important;border:0!important;padding:0 0 56.303%!important;left:0!important;top:0!important;right:0!important;bottom:0!important">
+            <div style="display:block!important;position:relative!important;max-width:177.778vh!important;margin:auto!important;padding:0!important;border:0!important">
+                <div style="display:block!important;position:relative!important;width:100%!important;height:0!important;box-sizing:content-box!important;margin:0!important;border:0!important;padding:0 0 56.25%!important;left:0!important;top:0!important;right:0!important;bottom:0!important">
                     <iframe 
                         id="radarIframe"
                         frameborder="0" 
                         allowfullscreen
-                        style="display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;right:auto!important;bottom:auto!important"
+                        style="display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;right:auto!important;bottom:auto!important;z-index:1;"
                         loading="lazy"
                     ></iframe>
                 </div>
             </div>
-            <div id="mapLoading">
-                <div class="spinner-border text-light" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-            <div id="locationDisplay"></div>
+            <div id="locationDisplay" class="mt-3 mb-1"></div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/mobile-optimize.js"></script>
     <script>
-        const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
+        // Function to safely parse localStorage
+        function getLocationData() {
+            try {
+                const locationStr = localStorage.getItem('weatherLocation');
+                return locationStr ? JSON.parse(locationStr) : null;
+            } catch (e) {
+                console.error('Error parsing location data:', e);
+                return null;
+            }
+        }
+
+        const locationData = getLocationData();
         const locationDisplay = document.getElementById('locationDisplay');
         const mapLoading = document.getElementById('mapLoading');
         const openRadarBtn = document.getElementById('openRadarBtn');
         
-        // Direct Ventusky URL format
-        const iframeSrc = `https://www.ventusky.com/?p=${locationData?.lat || 40};${locationData?.lon || -100};5&l=radar`;
-        const embedSrc = `https://embed.ventusky.com/?p=${locationData?.lat || 40};${locationData?.lon || -100};5&l=radar`;
+        // Get coordinates with fallback
+        const lat = locationData?.lat || 40;
+        const lon = locationData?.lon || -100;
+        const locationName = locationData?.name || "Default location";
+        
+        // Direct Ventusky URL format with pin
+        const iframeSrc = `https://www.ventusky.com/?p=${lat};${lon};7&l=radar&pin=${lat};${lon};dot;${encodeURIComponent(locationName)}`;
+        const embedSrc = `https://embed.ventusky.com/?p=${lat};${lon};7&l=radar&pin=${lat};${lon};dot;${encodeURIComponent(locationName)}`;
         
         // Set iframe source to embed version
-        document.getElementById('radarIframe').src = embedSrc;
+        const radarIframe = document.getElementById('radarIframe');
+        
+        // Try to force a clean load with a small delay
+        setTimeout(() => {
+            radarIframe.src = embedSrc;
+        }, 100);
 
         if (locationData) {
             locationDisplay.innerHTML = `<h3>Showing radar for: ${locationData.name}</h3>`;
             
-            // Set timeout for loading
-            const loadTimeout = setTimeout(() => {
-                if (mapLoading.style.display !== 'none') {
-                    mapLoading.innerHTML = `
-                        <div class="alert alert-warning">
-                            <p>The radar map is taking too long to load.</p>
-                            <p>You can try:</p>
-                            <ul>
-                                <li><a href="${iframeSrc}" target="_blank" class="alert-link">Opening the map in a new tab</a></li>
-                                <li><a href="javascript:location.reload()" class="alert-link">Refreshing this page</a></li>
-                            </ul>
-                        </div>
-                    `;
-                }
-            }, 10000); // 10 second timeout
+            // Add reload button
+            const reloadButton = document.createElement('button');
+            reloadButton.className = 'btn btn-outline-secondary mt-3';
+            reloadButton.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Reload Radar';
+            reloadButton.onclick = reloadRadar;
+            locationDisplay.appendChild(reloadButton);
 
-            document.getElementById('radarIframe').onload = () => {
-                clearTimeout(loadTimeout);
-                mapLoading.style.display = 'none';
-            };
+            // Simplified reload radar function
+            function reloadRadar() {
+                // Force a complete reload by removing and re-adding the iframe
+                const parentDiv = radarIframe.parentNode;
+                const newIframe = document.createElement('iframe');
+                newIframe.id = 'radarIframe';
+                newIframe.frameborder = "0";
+                newIframe.allowfullscreen = true;
+                newIframe.style = "display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;border:0!important;right:auto!important;bottom:auto!important;z-index:1;";
+                newIframe.loading = "lazy";
+                
+                // Remove old iframe and add new one
+                parentDiv.removeChild(radarIframe);
+                parentDiv.appendChild(newIframe);
+                
+                // Add a small delay before setting src
+                setTimeout(() => {
+                    newIframe.src = embedSrc + '&t=' + new Date().getTime();
+                }, 200);
+            }
 
-            document.getElementById('radarIframe').onerror = (error) => {
-                clearTimeout(loadTimeout);
-                console.error('Error loading map:', error);
-                mapLoading.innerHTML = `
+            // Handle connection errors
+            window.addEventListener('offline', () => {
+                locationDisplay.innerHTML = `
                     <div class="alert alert-danger">
-                        <p>Error loading radar map.</p>
-                        <p>You can try:</p>
-                        <ul>
-                            <li><a href="${iframeSrc}" target="_blank" class="alert-link">Opening the map in a new tab</a></li>
-                            <li><a href="javascript:location.reload()" class="alert-link">Refreshing this page</a></li>
-                        </ul>
+                        <p><i class="fas fa-wifi-slash me-2"></i>You are offline. Please check your internet connection.</p>
+                        <button class="btn btn-primary mt-2" onclick="location.reload()">
+                            <i class="fas fa-sync-alt me-2"></i>Try Again
+                        </button>
                     </div>
                 `;
-            };
+            });
         } else {
             locationDisplay.innerHTML = `
                 <div class="alert alert-warning">
                     No location selected. Please go back to the home page and enter a location.
                 </div>
             `;
-            mapLoading.style.display = 'none';
             openRadarBtn.style.display = 'none';
         }
         
@@ -106,13 +128,11 @@
             // Open the main Ventusky site (not the embed) in a new tab
             window.open(iframeSrc, '_blank');
         }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="js/navigation.js"></script>
-    <script>
+        
         // Initialize navigation
-        Navigation.createNavigation('navigationContainer');
+        document.addEventListener('DOMContentLoaded', function() {
+            Navigation.createNavigation('navigationContainer');
+        });
     </script>
 </body>
 </html>

@@ -611,6 +611,7 @@ p {
     margin-bottom: 20px;
     box-shadow: var(--box-shadow);
     border: 1px solid var(--border-color);
+    position: relative;
 }
 
 .current-details {
@@ -648,59 +649,95 @@ p {
     color: var(--text-color);
 }
 
-.hourly-container {
+.hourly-container, .daily-container {
     display: flex;
     overflow-x: auto;
     padding: 15px 0;
     gap: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    position: relative;
+    padding-left: 0;
+    width: 100%;
 }
 
-.hour-forecast {
+.hour-forecast, .day-forecast {
+    scroll-snap-align: start;
+    min-width: 140px; /* Match exactly */
+    width: 140px; /* Set fixed width for both */
+    transition: transform 0.2s, opacity 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 120px;
-    padding: 10px;
-    background: var(--nav-hover-bg);
-    border-radius: 8px;
-    color: var(--text-color);
+    justify-content: center;
+    background: var(--content-bg);
+    border-radius: 12px;
+    padding: 15px 10px;
     border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
+    margin-right: 0;
+    box-sizing: border-box;
 }
 
-.hour-forecast:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--box-shadow);
-}
-
-.hour-forecast .time {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: var(--text-color);
-}
-
+/* Override grid layout for daily container completely */
 .daily-container {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
+    display: flex !important;
+    grid-template-columns: unset !important;
+    flex-wrap: nowrap !important;
+}
+
+.hourly-container::-webkit-scrollbar,
+.daily-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.hourly-container::-webkit-scrollbar-thumb,
+.daily-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 6px;
+}
+
+/* Add scroll indicator */
+.hourly-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z'/%3E%3C/svg%3E");
+    background-size: 18px;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: pulse 1.5s infinite;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.hourly-container.scrolled-end::after {
+    display: none;
+}
+
+@keyframes pulse {
+    0% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.1); }
+    100% { transform: translateY(-50%) scale(1); }
 }
 
 .day-forecast {
-    flex: 1;
-    min-width: 140px;
-    text-align: center;
-    padding: 15px;
-    background: var(--nav-hover-bg);
-    border-radius: 8px;
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
+    scroll-snap-align: start;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
 .day-forecast:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--box-shadow);
+    transform: translateY(-5px);
+    opacity: 0.9;
 }
 
 .day-forecast .day {
@@ -713,14 +750,20 @@ p {
     margin-top: 8px;
     width: 100%;
     font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .detail {
-    margin: 4px 0;
+    margin: 0;
+    padding: 3px 5px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
 }
 
 .detail i {
@@ -869,30 +912,62 @@ p {
     width: 42px;
     height: 42px;
     padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.mobile-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focus-outline);
+}
+
+.mobile-toggle .navbar-toggler-icon.active {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='white' d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+/* Light mode specific hamburger icon */
+.light-theme .mobile-toggle {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .mobile-toggle .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 0.75)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.light-theme .mobile-toggle .navbar-toggler-icon.active {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='rgba(0, 0, 0, 0.75)' d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
 }
 
 /* Adjust main content to accommodate sidebar */
 @media (max-width: 992px) {
     body {
-        padding-left: 25px;
+        padding-left: 0;
         padding-top: 60px; /* Add space for the hamburger menu */
     }
     
     .sidebar {
-        left: -250px;
+        position: fixed;
+        top: 0;
+        left: -280px;
+        bottom: 0;
+        width: 280px;
+        height: 100%;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        transition: left 0.3s ease;
+        z-index: 1050;
     }
     
     .sidebar.expanded {
         left: 0;
     }
     
-    .mobile-toggle {
-        display: block;
+    .sidebar.collapsed {
+        left: -280px;
     }
     
-    body {
-        padding-left: 0;
+    .mobile-toggle {
+        display: block;
     }
     
     .sidebar .navbar-brand {
@@ -912,18 +987,138 @@ p {
     .sidebar .nav-link {
         padding: 0.6rem 1rem;
     }
+    
+    .content-box.main {
+        width: 95%;
+        margin: 15px auto;
+    }
 }
 
 /* Mobile-specific content adjustments */
 @media (max-width: 576px) {
     .content-box {
-        width: 90%;
+        width: 95%;
         padding: 20px 15px;
+        margin: 15px auto;
     }
     
     .mobile-toggle {
-        top: 5px;
-        left: 5px;
+        left: 10px;
+    }
+    
+    .desktop-temp-toggle {
+        display: none !important;
+    }
+    
+    #location-info {
+        margin-top: 5px !important;
+    }
+    
+    .mobile-temp-switcher {
+        position: static !important;
+        z-index: 5;
+        background: var(--content-bg);
+        box-shadow: var(--box-shadow);
+        padding: 5px;
+        border-radius: 8px;
+        overflow: hidden;
+        width: auto;
+        max-width: 140px;
+        margin: 0 auto 15px;
+        border: 1px solid var(--border-color);
+        display: flex !important;
+        justify-content: center;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+    }
+    
+    .mobile-temp-switcher .btn-group {
+        display: flex;
+        width: 100%;
+        margin-top: 0;
+    }
+    
+    .mobile-temp-switcher .btn {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        flex: 1;
+        min-width: 45px;
+        margin: 0;
+        color: var(--text-color) !important;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mobile-temp-switcher .btn.btn-secondary {
+        background: var(--secondary-btn-bg);
+        color: var(--text-color) !important;
+    }
+    
+    /* Light theme styles */
+    .light-theme .mobile-temp-switcher {
+        background: var(--content-bg);
+        border: 1px solid var(--border-color);
+    }
+    
+    .light-theme .mobile-temp-switcher .btn {
+        color: var(--text-color) !important;
+    }
+    
+    .light-theme .mobile-temp-switcher .btn.btn-secondary {
+        background-color: var(--secondary-btn-bg) !important;
+        color: var(--text-color) !important;
+    }
+    
+    @supports (padding: env(safe-area-inset-top)) {
+        .mobile-temp-switcher {
+            position: static !important;
+            top: auto !important;
+            right: auto !important;
+        }
+    }
+    
+    body {
+        padding-top: 65px;
+    }
+    
+    .radar-container {
+        height: auto;
+        min-height: 300px;
+    }
+    
+    /* Make text more readable on small screens */
+    p, .alert {
+        font-size: 0.95rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.3rem;
+    }
+    
+    /* Adjust button sizes */
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Adjust form controls */
+    .form-control {
+        font-size: 0.95rem;
+        padding: 0.375rem 0.5rem;
     }
 }
 
@@ -1147,17 +1342,40 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
         margin-bottom: 20px;
     }
 
-    .daily-container {
-        justify-content: center;
-    }
-
-    .day-forecast {
-        min-width: 140px;
+    .daily-container, .hourly-container {
+        padding-left: 0;
+        padding-right: 0;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding: 0;
+        gap: 15px;
     }
     
-    .hourly-container {
-        justify-content: flex-start;
-        padding-bottom: 10px;
+    .hour-forecast, .day-forecast {
+        min-width: 140px; /* Same fixed width on mobile */
+        width: 140px;
+        padding: 15px 10px;
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+    
+    /* Center containers when no scrolling needed */
+    .hourly-container.no-scroll-needed, 
+    .daily-container.no-scroll-needed {
+        justify-content: center;
+    }
+}
+
+/* Desktop specific adjustments */
+@media (min-width: 769px) {
+    .hour-forecast, .day-forecast {
+        min-width: 140px; /* Same width on desktop */
+        width: 140px;
+    }
+    
+    /* Keep daily container as flex on desktop too for consistency */
+    .daily-container {
+        display: flex !important;
+        flex-wrap: nowrap !important;
     }
 }
 
@@ -1244,7 +1462,7 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
     position: relative;
     width: 100%;
     height: 0;
-    padding-bottom: 60%; /* Maintain aspect ratio */
+    padding-bottom: 60%;
     background-color: var(--content-bg);
     border-radius: 8px;
     overflow: hidden;
@@ -1273,13 +1491,13 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
 /* Responsive adjustments for radar */
 @media (max-width: 768px) {
     .radar-wrapper {
-        padding-bottom: 75%; /* Taller aspect ratio on mobile */
+        padding-bottom: 75%;
     }
 }
 
 @media (max-width: 576px) {
     .radar-wrapper {
-        padding-bottom: 100%; /* Square aspect ratio on small devices */
+        padding-bottom: 100%;
     }
 }
 
@@ -1287,4 +1505,333 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
     .radar-container {
         max-width: 90%;
     }
+}
+
+/* Mobile optimizations added */
+@media (max-width: 992px) {
+    .sidebar {
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100);
+    }
+    
+    button, a, .btn, .nav-link {
+        min-height: 44px;
+    }
+    
+    .is-scrolling * {
+        transition-duration: 0ms !important;
+        animation-duration: 0ms !important;
+    }
+}
+
+/* Toast notifications for network status */
+.network-toast {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: var(--content-bg);
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.network-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.network-toast.online {
+    border-left: 4px solid #4cd964;
+}
+
+.network-toast.offline {
+    border-left: 4px solid #ff3b30;
+}
+
+.network-toast i {
+    margin-right: 8px;
+}
+
+/* Optimize for iPhone notch/dynamic island */
+@supports (padding: max(0px)) {
+    .mobile-toggle {
+        top: max(10px, env(safe-area-inset-top));
+        left: max(10px, env(safe-area-inset-left));
+    }
+    
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+    
+    .sidebar {
+        padding-top: max(0px, env(safe-area-inset-top));
+        padding-left: max(0px, env(safe-area-inset-left));
+    }
+}
+
+/* Prevent content overflow on small devices */
+img, video, iframe, embed, object, canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Fast tap for mobile */
+a, button, .btn, .nav-link {
+    touch-action: manipulation;
+}
+
+/* Unit Toggle Buttons Styles */
+.unit-toggle {
+    display: inline-flex;
+    align-items: center;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.unit-toggle .btn {
+    min-width: 40px;
+    font-weight: 500;
+    padding: 0.3rem 0.6rem;
+    transition: all 0.3s ease;
+}
+
+/* Desktop styles for unit toggle */
+@media (min-width: 769px) {
+    .unit-toggle {
+        align-self: flex-end;
+        margin-left: 10px;
+    }
+}
+
+/* Medium devices */
+@media (max-width: 768px) {
+    .unit-toggle {
+        align-self: flex-start;
+        margin-bottom: 15px;
+    }
+    
+    .current-details {
+        margin-top: 0;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .conditions {
+        margin-top: 15px;
+        width: 100%;
+    }
+}
+
+/* Content box centering fix */
+.content-box.main {
+    width: 75%;
+    margin: 30px auto;
+    max-width: 1200px;
+    text-align: center;
+    position: relative;
+    left: 0;
+    right: 0;
+}
+
+.content-box.main .row {
+    justify-content: center;
+}
+
+.content-box.main .row > div {
+    display: flex;
+    justify-content: center;
+}
+
+.content-box.main .weather-section,
+.content-box.main .card {
+    width: 100%;
+    text-align: center;
+}
+
+@media (max-width: 992px) {
+    .content-box.main {
+        width: 95%;
+        margin: 15px auto;
+    }
+}
+
+/* Specific centering fixes for various pages */
+#locationDisplay {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#locationDisplay h3 {
+    margin-bottom: 15px;
+}
+
+.alert {
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.radar-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.aqi-card {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Extra styling for very narrow devices */
+@media (max-width: 360px) {
+    #current-weather h3 {
+        margin-bottom: 12px;
+    }
+    
+    .unit-toggle {
+        width: 100%;
+        margin-bottom: 20px;
+        margin-top: 5px;
+    }
+    
+    .unit-toggle .btn {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.85rem;
+        flex: 1;
+    }
+    
+    #current-weather .d-flex.flex-column.flex-md-row {
+        margin-bottom: 10px;
+    }
+    
+    h3 {
+        font-size: 1.2rem;
+        line-height: 1.3;
+    }
+    
+    .temperature {
+        font-size: 2.5rem;
+    }
+    
+    .conditions p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+}
+
+/* Extra styling for super-narrow devices (iPhone SE, etc.) */
+@media (max-width: 320px) {
+    .unit-toggle {
+        width: 100%;
+        margin-bottom: 25px !important;
+        margin-top: 8px !important;
+    }
+    
+    #current-weather .d-flex.flex-column.flex-md-row {
+        margin-bottom: 35px !important;
+    }
+    
+    #current-weather {
+        padding-top: 15px !important;
+        padding-bottom: 20px !important;
+    }
+    
+    h3 {
+        font-size: 1.1rem !important;
+    }
+    
+    .weather-section {
+        padding: 15px 10px !important;
+    }
+    
+    .current-details {
+        padding-top: 10px !important;
+        margin-top: 15px !important;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .conditions {
+        margin-top: 20px !important;
+    }
+    
+    .condition-text {
+        font-size: 0.8rem !important;
+        line-height: 1.2 !important;
+    }
+}
+
+/* Forecast header specific styling */
+.forecast-header {
+    position: relative;
+    width: 100%;
+}
+
+@media (max-width: 320px) {
+    .forecast-header {
+        display: block !important;
+        margin-bottom: 15px !important;
+        text-align: center;
+    }
+    
+    .forecast-header h3 {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 15px !important;
+    }
+    
+    .forecast-header .unit-toggle {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin: 0 auto 25px;
+    }
+}
+
+/* Mobile-optimized Forecast Scrolling */
+@media (max-width: 991.98px) {
+    .hourly-container, .daily-container {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-color) transparent;
+        padding-bottom: 10px;
+    }
+    
+    .hourly-container::-webkit-scrollbar, 
+    .daily-container::-webkit-scrollbar {
+        height: 6px;
+        display: block;
+    }
+    
+    .hourly-container::-webkit-scrollbar-thumb,
+    .daily-container::-webkit-scrollbar-thumb {
+        background-color: var(--border-color);
+        border-radius: 6px;
+        opacity: 0.8;
+    }
+    
+    .hourly-container::-webkit-scrollbar-track,
+    .daily-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
+
+/* Remove scroll indicator styles */
+.scroll-indicator {
+    display: none;
+}
+
+@keyframes pulseRight {
+    0% { transform: translateY(-50%) translateX(0); opacity: 0.6; }
+    50% { transform: translateY(-50%) translateX(5px); opacity: 0.8; }
+    100% { transform: translateY(-50%) translateX(0); opacity: 0.6; }
 }

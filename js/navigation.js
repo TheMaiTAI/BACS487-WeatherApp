@@ -30,12 +30,13 @@ class Navigation {
 
         const nav = document.createElement('nav');
         nav.className = 'navbar navbar-dark sidebar collapsed';
+        nav.setAttribute('id', 'mainSidebar');
         
         nav.innerHTML = `
             <a class="navbar-brand d-flex align-items-center" href="index.html">
                 <i class="fas fa-cloud-sun"></i>Weather App
             </a>
-            <button class="navbar-toggler mobile-toggle" type="button" aria-label="Toggle navigation">
+            <button class="navbar-toggler mobile-toggle" type="button" id="sidebarToggle" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="navbar-collapse" id="navbarNav">
@@ -92,11 +93,52 @@ class Navigation {
         });
 
         // Add event listener to toggle mobile navigation
-        const toggleButton = nav.querySelector('.mobile-toggle');
-        toggleButton.addEventListener('click', () => {
-            nav.classList.toggle('collapsed');
-            nav.classList.toggle('expanded');
-        });
+        const toggleButton = document.getElementById('sidebarToggle');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('collapsed');
+                    sidebar.classList.toggle('expanded');
+                    
+                    // Toggle the aria-expanded attribute for accessibility
+                    const isExpanded = sidebar.classList.contains('expanded');
+                    toggleButton.setAttribute('aria-expanded', isExpanded);
+                    
+                    // Update toggle button icon if needed
+                    const toggleIcon = toggleButton.querySelector('.navbar-toggler-icon');
+                    if (toggleIcon) {
+                        toggleIcon.classList.toggle('active');
+                    }
+                }
+            });
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar && sidebar.classList.contains('expanded')) {
+                    // Check if click is outside the sidebar
+                    if (!sidebar.contains(e.target) && e.target !== toggleButton) {
+                        sidebar.classList.remove('expanded');
+                        sidebar.classList.add('collapsed');
+                        toggleButton.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+            
+            // Close sidebar when pressing Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const sidebar = document.getElementById('mainSidebar');
+                    if (sidebar && sidebar.classList.contains('expanded')) {
+                        sidebar.classList.remove('expanded');
+                        sidebar.classList.add('collapsed');
+                        toggleButton.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+        }
 
         // Initialize theme toggle functionality
         this.initThemeToggle();
