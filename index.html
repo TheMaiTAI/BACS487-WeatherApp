@@ -108,6 +108,9 @@
         const OPENWEATHER_API_KEY = 'c1ebc435fc4c558d9501e772be6e7a35';
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Add index-page class to body for proper centering
+            document.body.classList.add('index-page');
+            
             initializeLocationFunctionality();
             initializeThemeToggle();
         });
