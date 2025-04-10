@@ -81,7 +81,7 @@ export function Layout() {
         <div className="flex flex-col min-h-screen">
           <TooltipProvider>
             <Navbar />
-            <main className="flex-1 py-6 relative z-10">
+            <main className="flex-1 py-6 relative z-10 pb-20 md:pb-6">
               <div className="container">
                 <div className="animate-fade-in">
                   <Outlet />
