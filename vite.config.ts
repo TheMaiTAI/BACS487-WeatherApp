@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: '/BACS487-WeatherApp/',
+  base: process.env.NODE_ENV === 'production' ? '/BACS487-WeatherApp/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
