@@ -147,26 +147,67 @@
 
         async function fetchUVData(locationData) {
             try {
-                const response = await fetch(`https://api.openuv.io/api/v1/uv?lat=${locationData.lat}&lng=${locationData.lon}`, {
-                    headers: {
-                        'x-access-token': 'openuv-2u719cxrm7cwi2r0-io'
-                    }
-                });
+                // Use OpenWeather's OneCall API to get the UV index
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/onecall?lat=${locationData.lat}&lon=${locationData.lon}&exclude=minutely,hourly,daily,alerts&appid=${OPENWEATHER_API_KEY}`
+                );
                 
                 if (!response.ok) throw new Error('Failed to fetch UV data');
                 const data = await response.json();
                 
-                if (data.result) {
-                    updateUVDisplay(data.result.uv);
+                if (data && data.current && data.current.uvi !== undefined) {
+                    updateUVDisplay(data.current.uvi);
                 } else {
-                    throw new Error('UV data not available');
+                    throw new Error('UV data not available in response');
                 }
             } catch (error) {
                 console.error('Error fetching UV data:', error);
                 document.getElementById('uvIndex').textContent = 'UV data unavailable';
                 document.getElementById('uvDescription').textContent = 'Unable to fetch UV data';
                 document.getElementById('uvWarning').textContent = '';
+                
+                // Fallback to estimated UV based on time of day and location
+                try {
+                    estimateUVIndex(locationData);
+                } catch (fallbackError) {
+                    console.error('Error with UV fallback:', fallbackError);
+                }
             }
+        }
+        
+        function estimateUVIndex(locationData) {
+            const now = new Date();
+            const sunTimes = SunCalc.getTimes(now, locationData.lat, locationData.lon);
+            const sunPosition = SunCalc.getPosition(now, locationData.lat, locationData.lon);
+            
+            // Basic estimation based on sun elevation and time of day
+            // This is not accurate but provides a fallback when API fails
+            const sunAltitudeDegrees = sunPosition.altitude * (180 / Math.PI);
+            
+            // Nighttime (no UV)
+            if (now < sunTimes.sunrise || now > sunTimes.sunset) {
+                updateUVDisplay(0);
+                return;
+            }
+            
+            // Estimate based on sun position (very simplified)
+            let estimatedUV = 0;
+            
+            if (sunAltitudeDegrees > 60) {
+                estimatedUV = 8; // Very high when sun is high in the sky
+            } else if (sunAltitudeDegrees > 45) {
+                estimatedUV = 6; // High
+            } else if (sunAltitudeDegrees > 30) {
+                estimatedUV = 4; // Moderate
+            } else if (sunAltitudeDegrees > 15) {
+                estimatedUV = 2; // Low
+            } else {
+                estimatedUV = 1; // Very low
+            }
+            
+            // Add note that this is estimated
+            updateUVDisplay(estimatedUV);
+            document.getElementById('uvDescription').textContent += ' (Estimated)';
         }
 
         function updateUVDisplay(uvIndex) {
