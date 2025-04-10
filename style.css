@@ -910,13 +910,17 @@ p {
     font-size: 1.4rem;
     background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback for browsers that don't support text fill */
 }
 
 .light-theme .sidebar .navbar-brand i {
     background: linear-gradient(135deg, #31708e 0%, #8fc1e3 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback for browsers that don't support text fill */
 }
 
 .sidebar .navbar-collapse {
