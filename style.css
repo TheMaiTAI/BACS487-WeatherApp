@@ -63,7 +63,7 @@ body {
     overflow-x: hidden;
     background: var(--bg-gradient);
     padding-left: 250px;
-    transition: background 0.3s ease, color 0.3s ease, padding 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Remove left padding for index page */
@@ -285,6 +285,43 @@ p {
     color: white !important;
 }
 
+/* Light mode specific form control styling */
+.light-theme .form-control {
+    color: #2d3748 !important;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.light-theme .form-control:focus {
+    color: #2d3748 !important;
+    background: #ffffff;
+}
+
+/* Fix for input text color in light mode */
+.light-theme input[type="text"],
+.light-theme input[type="text"]:focus,
+.light-theme input.form-control,
+.light-theme input.form-control:focus,
+.light-theme #locationInput,
+.light-theme #locationInput:focus {
+    color: #2d3748 !important;
+}
+
+/* Extra specificity for the index page search box */
+body.light-theme .search-form input[type="text"],
+body.light-theme .search-form input[type="text"]:focus,
+body.light-theme .search-form .form-control,
+body.light-theme .search-form .form-control:focus,
+body.light-theme #locationForm #locationInput,
+body.light-theme #locationForm #locationInput:focus {
+    color: #2d3748 !important;
+    caret-color: #2d3748 !important; /* Make cursor visible too */
+}
+
+/* Ensure placeholder text is visible in light mode */
+.light-theme .form-control::placeholder {
+    color: rgba(45, 55, 72, 0.7) !important;
+}
+
 /* Autocomplete Results */
 .autocomplete-results {
     position: absolute;
@@ -481,12 +518,10 @@ p {
 
 .nav-card:hover::before {
     opacity: 1;
-    animation: pulse 2s infinite;
 }
 
 .nav-card:hover::after {
     left: 100%;
-    animation: shine 1.5s ease forwards;
 }
 
 @keyframes shine {
@@ -510,7 +545,6 @@ p {
 .nav-card:hover i {
     transform: scale(1.15);
     color: #0052cc;
-    animation: floatIcon 3s ease-in-out infinite;
 }
 
 .nav-card span {
@@ -556,11 +590,7 @@ p {
 }
 
 /* Custom Icons Animation */
-.nav-card i.fa-satellite-dish { animation-delay: 0.1s; }
-.nav-card i.fa-calendar-alt { animation-delay: 0.2s; }
-.nav-card i.fa-wind { animation-delay: 0.3s; }
-.nav-card i.fa-sun { animation-delay: 0.4s; }
-.nav-card i.fa-clock { animation-delay: 0.5s; }
+/* Removing empty rulesets that have no declarations */
 
 /* Weather-specific Hover Effects */
 .nav-card:hover {
