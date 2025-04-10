@@ -68,6 +68,7 @@
                             <h4 class="card-title">Air Quality Index</h4>
                             <h5 class="card-subtitle mb-2">${category.category}</h5>
                             <p class="card-text">${category.description}</p>
+                            <div class="aqi-value">AQI: <span class="badge rounded-pill" style="background-color: ${category.color}; color: ${getContrastColor(category.color)};">${aqi}</span></div>
                         </div>
                     </div>`;
             } else {
@@ -92,6 +93,23 @@
             } else {
                 return { category: 'Hazardous', color: '#7e0023', description: 'Health warning of emergency conditions: everyone is more likely to be affected.' };
             }
+        }
+
+        // Helper function to determine text color based on background
+        function getContrastColor(hexcolor) {
+            // Remove the # if present
+            hexcolor = hexcolor.replace('#', '');
+            
+            // Convert to RGB
+            const r = parseInt(hexcolor.substr(0, 2), 16);
+            const g = parseInt(hexcolor.substr(2, 2), 16);
+            const b = parseInt(hexcolor.substr(4, 2), 16);
+            
+            // Calculate luminance - standard formula
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            
+            // Return black for bright colors, white for dark colors
+            return luminance > 0.5 ? '#000000' : '#ffffff';
         }
     </script>
 </body>

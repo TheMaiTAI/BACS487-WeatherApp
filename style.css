@@ -1125,25 +1125,55 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
 
 /* Air Quality Card Styles */
 .aqi-card {
-    background-color: var(--content-bg);
-    color: var(--text-color);
+    background-color: var(--content-bg) !important;
+    color: var(--text-color) !important;
     transition: all 0.3s ease;
+    border: 1px solid var(--border-color) !important;
+}
+
+.aqi-card .card-body {
+    background-color: var(--content-bg) !important;
 }
 
 .aqi-card .card-title,
 .aqi-card .card-subtitle,
 .aqi-card .card-text {
-    color: var(--text-color);
+    color: var(--text-color) !important;
+}
+
+.aqi-value {
+    margin-top: 15px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.aqi-value .badge {
+    font-size: 1rem;
+    padding: 8px 12px;
 }
 
 .light-theme .aqi-card {
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.light-theme .aqi-card .card-body {
+    background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
 .light-theme .aqi-card .card-title,
 .light-theme .aqi-card .card-subtitle,
 .light-theme .aqi-card .card-text {
+    color: var(--text-color) !important;
+}
+
+/* Override Bootstrap card styles for proper theming */
+.card {
+    background-color: var(--content-bg);
     color: var(--text-color);
+}
+
+.light-theme .card {
+    background-color: #fff;
 }
 
 /* Make alert messages theme-compatible */
@@ -1163,4 +1193,60 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
 
 .alert-danger {
     border-left: 5px solid #dc3545;
+}
+
+/* Improved Radar Page Styles */
+.radar-container {
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+.radar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 60%; /* Maintain aspect ratio */
+    background-color: var(--content-bg);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.radar-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.radar-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background-color: var(--content-bg);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Responsive adjustments for radar */
+@media (max-width: 768px) {
+    .radar-wrapper {
+        padding-bottom: 75%; /* Taller aspect ratio on mobile */
+    }
+}
+
+@media (max-width: 576px) {
+    .radar-wrapper {
+        padding-bottom: 100%; /* Square aspect ratio on small devices */
+    }
+}
+
+@media (min-width: 1200px) {
+    .radar-container {
+        max-width: 90%;
+    }
 }
