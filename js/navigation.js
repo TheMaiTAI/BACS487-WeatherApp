@@ -1,3 +1,11 @@
+/**
+ * Navigation class for creating the sidebar navigation.
+ * 
+ * The navigation has been updated to use a vertical sidebar design
+ * positioned on the left side of the screen with improved styling.
+ * 
+ * See docs/navbar-update.md for complete documentation of changes.
+ */
 class Navigation {
     static createNavigation(containerId) {
         // Check if we're on index.html and have location data
@@ -21,49 +29,59 @@ class Navigation {
         if (!container) return;
 
         const nav = document.createElement('nav');
-        nav.className = 'navbar navbar-expand-lg navbar-dark bg-dark';
+        nav.className = 'navbar navbar-dark sidebar';
+        
         nav.innerHTML = `
-            <div class="container-fluid">
-                <a class="navbar-brand" href="index.html">Weather App</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="forecast.html">
-                                <i class="fas fa-cloud-sun"></i> Forecast
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="radar.html">
-                                <i class="fas fa-broadcast-tower"></i> Radar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="precipitation.html">
-                                <i class="fas fa-cloud-rain"></i> Precipitation
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="sun-tracker.html">
-                                <i class="fas fa-sun"></i> Sun Tracker
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="air-quality.html">
-                                <i class="fas fa-wind"></i> Air Quality
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="weather-alerts.html">
-                                <i class="fas fa-exclamation-triangle"></i> Weather Alerts
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-cloud-sun"></i>Weather App
+            </a>
+            <div class="navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav flex-column w-100">
+                    <li class="nav-item">
+                        <a class="nav-link" href="forecast.html">
+                            <i class="fas fa-cloud-sun"></i><span>Forecast</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="radar.html">
+                            <i class="fas fa-broadcast-tower"></i><span>Radar</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="precipitation.html">
+                            <i class="fas fa-cloud-rain"></i><span>Precipitation</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sun-tracker.html">
+                            <i class="fas fa-sun"></i><span>Sun Tracker</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="air-quality.html">
+                            <i class="fas fa-wind"></i><span>Air Quality</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="weather-alerts.html">
+                            <i class="fas fa-exclamation-triangle"></i><span>Weather Alerts</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
         `;
         container.appendChild(nav);
+        
+        // Add active class to current page link
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const navLinks = nav.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            }
+        });
     }
 }

@@ -14,6 +14,7 @@ body {
     position: relative;
     overflow-x: hidden;
     background-color: black;
+    padding-left: 250px;
 }
 
 /* Weather-themed Background */
@@ -735,5 +736,168 @@ p {
 
     .day-forecast {
         min-width: 140px;
+    }
+}
+
+/* Sidebar Navigation Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    padding: 0;
+    background: linear-gradient(180deg, #1a2980 0%, #26d0ce 150%);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar .container-fluid {
+    padding: 0;
+    width: 100%;
+}
+
+.sidebar .navbar-brand {
+    font-size: 1.3rem;
+    padding: 1rem 1.5rem;
+    margin: 0 0 1.5rem 0;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .navbar-brand i {
+    margin-right: 10px;
+    font-size: 1.4rem;
+}
+
+.sidebar .navbar-nav {
+    width: 100%;
+    padding: 0;
+}
+
+.sidebar .navbar-collapse {
+    padding: 0;
+    width: 100%;
+}
+
+.sidebar .nav-item {
+    width: 100%;
+    margin: 0.3rem 0;
+    padding: 0 0.5rem;
+}
+
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: visible;
+}
+
+.sidebar .nav-link:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.15);
+    padding-left: 1.3rem;
+}
+
+.sidebar .nav-link i {
+    width: 22px;
+    text-align: center;
+    margin-right: 12px;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+}
+
+.sidebar .nav-link:hover i {
+    transform: scale(1.1);
+}
+
+.sidebar .nav-link.active {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar .nav-link span {
+    white-space: nowrap;
+    display: block;
+    flex: 1;
+}
+
+/* Adjust main content to accommodate sidebar */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    body {
+        padding-left: 0;
+    }
+    
+    .sidebar .navbar-brand {
+        text-align: center;
+        justify-content: center;
+        padding: 0.6rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sidebar .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .sidebar .nav-item {
+        width: 100%;
+        margin: 0.2rem 0;
+    }
+    
+    .sidebar .nav-link {
+        padding: 0.6rem 1rem;
+    }
+    
+    .sidebar .nav-link:hover {
+        padding-left: 1.3rem;
+    }
+    
+    /* Fix for mobile toggle button */
+    .sidebar .navbar-toggler {
+        display: block;
+        position: absolute;
+        top: 0.5rem;
+        right: 1rem;
+    }
+}
+
+/* Fix for content boxes to work with sidebar */
+.content-box {
+    width: 75%;
+    margin: 30px auto;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 992px) {
+    .content-box {
+        width: 95%;
     }
 }
