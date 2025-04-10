@@ -13,7 +13,12 @@
     <div id="navigationContainer"></div>
 
     <div class="content-box main">
-        <p>View live weather radar updates.</p>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <p>View live weather radar updates.</p>
+            <button id="openRadarBtn" class="btn btn-primary" onclick="openRadarInNewTab()">
+                <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
+            </button>
+        </div>
         
         <div class="radar-container">
             <div style="display:block!important;position:relative!important;max-width:177.612vh!important;margin:auto!important;padding:0!important;border:0!important">
@@ -40,8 +45,14 @@
         const locationData = JSON.parse(localStorage.getItem('weatherLocation'));
         const locationDisplay = document.getElementById('locationDisplay');
         const mapLoading = document.getElementById('mapLoading');
-        const iframeSrc = `https://embed.ventusky.com/?p=${locationData.lat};${locationData.lon};11&l=radar&pin=${locationData.lat};${locationData.lon};dot;${encodeURIComponent(locationData.name)}`;
-        document.getElementById('radarIframe').src = iframeSrc;
+        const openRadarBtn = document.getElementById('openRadarBtn');
+        
+        // Direct Ventusky URL format
+        const iframeSrc = `https://www.ventusky.com/?p=${locationData?.lat || 40};${locationData?.lon || -100};5&l=radar`;
+        const embedSrc = `https://embed.ventusky.com/?p=${locationData?.lat || 40};${locationData?.lon || -100};5&l=radar`;
+        
+        // Set iframe source to embed version
+        document.getElementById('radarIframe').src = embedSrc;
 
         if (locationData) {
             locationDisplay.innerHTML = `<h3>Showing radar for: ${locationData.name}</h3>`;
@@ -88,6 +99,12 @@
                 </div>
             `;
             mapLoading.style.display = 'none';
+            openRadarBtn.style.display = 'none';
+        }
+        
+        function openRadarInNewTab() {
+            // Open the main Ventusky site (not the embed) in a new tab
+            window.open(iframeSrc, '_blank');
         }
     </script>
 
