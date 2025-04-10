@@ -428,15 +428,19 @@ p {
 .nav-card::after {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
     background: linear-gradient(
-        120deg,
+        90deg,
         transparent 0%,
-        var(--content-bg) 30%,
-        transparent 48%
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
     );
-    transform: translateX(-100%);
-    transition: transform 0.7s ease;
+    transition: left 0.7s ease;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .nav-card:hover {
@@ -455,7 +459,17 @@ p {
 }
 
 .nav-card:hover::after {
-    transform: translateX(100%);
+    left: 100%;
+    animation: shine 1.5s ease forwards;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
 }
 
 /* Icon Styles and Animations */
