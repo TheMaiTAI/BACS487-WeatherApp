@@ -139,7 +139,7 @@ export interface DailyForecast {
 }
 
 // Fetch weather data
-export const getCurrentWeather = async (lat: number, lon: number, units: 'metric' | 'imperial' = 'imperial'): Promise<CurrentWeatherData | null> => {
+export const getCurrentWeather = async (lat: number, lon: number, units: 'metric' | 'imperial' = 'metric'): Promise<CurrentWeatherData | null> => {
   try {
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${OPENWEATHER_API_KEY}`
@@ -163,7 +163,7 @@ export const getCurrentWeather = async (lat: number, lon: number, units: 'metric
   }
 };
 
-export const getForecast = async (lat: number, lon: number, units: 'metric' | 'imperial' = 'imperial'): Promise<{ hourly: HourlyForecast[], daily: DailyForecast[] } | null> => {
+export const getForecast = async (lat: number, lon: number, units: 'metric' | 'imperial' = 'metric'): Promise<{ hourly: HourlyForecast[], daily: DailyForecast[] } | null> => {
   try {
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=${units}&appid=${OPENWEATHER_API_KEY}`
