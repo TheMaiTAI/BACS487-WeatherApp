@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation as useRouterLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { TemperatureToggle } from "@/components/TemperatureToggle";
 import { useLocation } from "@/lib/LocationContext";
 import { MapPin, Menu, Home, Cloud, Navigation, CloudRain, Sun, Wind, AlertTriangle, X, ChevronUp } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -145,6 +146,7 @@ export function Navbar() {
                 </span>
               </div>
             )}
+            <TemperatureToggle />
             <ThemeToggle />
           </div>
         </div>
