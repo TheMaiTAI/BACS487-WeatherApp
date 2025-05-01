@@ -217,7 +217,7 @@
                             .then(data => {
                                 if (data.name) {
                                     // Automatically set the location data
-                                    locationInput.value = `${data.name}, US`; //THIS ONE
+                                    locationInput.value = `${data.name}, US`;
                                     document.getElementById('latInput').value = data.lat;
                                     document.getElementById('lonInput').value = data.lon;
                                     autocompleteResults.innerHTML = '';
@@ -234,7 +234,7 @@
                         return;
                     }
 
-                    // City search with autocomplete
+                    // City search with autocomplete -- Restored to 3/27/25 backup
                     fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${OPENWEATHER_API_KEY}`)
                         .then(response => response.json())
                         .then(data => {
